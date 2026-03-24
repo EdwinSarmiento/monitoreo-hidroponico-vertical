@@ -1,19 +1,71 @@
 #include <Arduino.h>
 #include <WiFi.h>
+#include <Wire.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <Preferences.h>
 #include <DNSServer.h>
+#include <Adafruit_ADS1X15.h>
 #include "config.h"
 
 AsyncWebServer server(80);
 DNSServer dnsServer;
 Preferences prefs;
+Adafruit_ADS1115 ads;
 
 bool pumpState = false;
 bool peri1State = false;
 bool peri2State = false;
 bool apMode = false;
+bool adsReady = false;
+
+float currentPH = 0.0;
+float currentVoltage = 0.0;
+unsigned long lastPHRead = 0;
+
+// =============================================
+//  Lectura de pH (ADS1115 o directo por GPIO)
+// =============================================
+#define PH_DIRECT_PIN 34
+
+float readPHVoltage() {
+  if (adsReady) {
+    long total = 0;
+    for (int i = 0; i < PH_SAMPLES; i++) {
+      int16_t raw = ads.readADC_SingleEnded(PH_ADS_CHANNEL);
+      total += raw;
+      delay(10);
+    }
+    float avgRaw = (float)total / PH_SAMPLES;
+    return ads.computeVolts(avgRaw);
+  }
+
+  // Lectura directa por GPIO34 (sin ADS1115)
+  long total = 0;
+  for (int i = 0; i < PH_SAMPLES; i++) {
+    total += analogRead(PH_DIRECT_PIN);
+    delay(10);
+  }
+  float avgRaw = (float)total / PH_SAMPLES;
+  return avgRaw * (3.3f / 4095.0f);
+}
+
+float voltageToPH(float voltage) {
+  float slope = (7.0f - 4.0f) / (PH_VOLTAGE_AT_7 - PH_VOLTAGE_AT_4);
+  float ph = 7.0f + slope * (voltage - PH_VOLTAGE_AT_7);
+  if (ph < 0.0f) ph = 0.0f;
+  if (ph > 14.0f) ph = 14.0f;
+  return ph;
+}
+
+void updatePH() {
+  if (millis() - lastPHRead < PH_READ_INTERVAL) return;
+  lastPHRead = millis();
+  currentVoltage = readPHVoltage();
+  currentPH = voltageToPH(currentVoltage);
+  String source = adsReady ? "ADS1115" : "GPIO34";
+  Serial.printf("pH: %.2f (%.3fV) [%s]\n", currentPH, currentVoltage, source.c_str());
+}
 
 // =============================================
 //  Portal de configuración WiFi (modo AP)
@@ -195,6 +247,46 @@ const char INDEX_HTML[] PROGMEM = R"rawliteral(
     .dot-on  { background: #4ade80; box-shadow: 0 0 8px rgba(74,222,128,0.5); }
     .dot-off { background: #6b7280; }
 
+    /* pH gauge */
+    .ph-gauge {
+      position: relative;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+    .ph-value {
+      font-size: 3rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .ph-unit { font-size: 1rem; color: #8ab4c4; margin-left: 4px; }
+    .ph-voltage {
+      font-size: 0.7rem; color: #4b6b7a; margin-top: 4px;
+    }
+    .ph-bar {
+      width: 100%; height: 8px; border-radius: 4px;
+      background: linear-gradient(to right,
+        #ef4444 0%, #f97316 14%, #eab308 28%,
+        #22c55e 42%, #22c55e 57%,
+        #3b82f6 71%, #6366f1 85%, #8b5cf6 100%);
+      position: relative; margin-top: 10px;
+    }
+    .ph-marker {
+      position: absolute; top: -4px;
+      width: 4px; height: 16px; border-radius: 2px;
+      background: #fff; box-shadow: 0 0 6px rgba(255,255,255,0.8);
+      transition: left 0.5s ease;
+    }
+    .ph-labels {
+      display: flex; justify-content: space-between;
+      font-size: 0.6rem; color: #4b6b7a; margin-top: 4px;
+    }
+    .ph-status {
+      font-size: 0.85rem; font-weight: 600; margin-top: 8px;
+    }
+
     .btn {
       width: 100%; padding: 13px; border: none; border-radius: 10px;
       font-size: 0.95rem; font-weight: 600; cursor: pointer;
@@ -244,6 +336,23 @@ const char INDEX_HTML[] PROGMEM = R"rawliteral(
     <div class="title">Hidroponia IoT</div>
     <div class="subtitle">Panel de Control</div>
 
+    <!-- Sensor de pH -->
+    <div class="section">
+      <div class="section-title">Sensor de pH</div>
+      <div class="ph-gauge">
+        <span class="ph-value" id="phValue">--</span>
+        <span class="ph-unit">pH</span>
+      </div>
+      <div class="ph-voltage" id="phVoltage">Voltaje: -- V</div>
+      <div class="ph-bar"><div class="ph-marker" id="phMarker" style="left:50%"></div></div>
+      <div class="ph-labels">
+        <span>&Aacute;cido (0)</span>
+        <span>Neutro (7)</span>
+        <span>Alcalino (14)</span>
+      </div>
+      <div class="ph-status" id="phStatus" style="color:#8ab4c4">Leyendo...</div>
+    </div>
+
     <!-- Bomba principal -->
     <div class="section">
       <div class="section-title">Bomba de Agua Principal</div>
@@ -285,7 +394,7 @@ const char INDEX_HTML[] PROGMEM = R"rawliteral(
   </div>
 
   <script>
-    let state = { pump: false, peri1: false, peri2: false };
+    let state = { pump: false, peri1: false, peri2: false, ph: 0, phV: 0 };
 
     async function fetchState() {
       try {
@@ -326,7 +435,37 @@ const char INDEX_HTML[] PROGMEM = R"rawliteral(
       try { await fetch('/reset-wifi', { method: 'POST' }); } catch (e) {}
     }
 
+    function getPhColor(ph) {
+      if (ph < 5.5) return '#ef4444';
+      if (ph < 6.0) return '#f97316';
+      if (ph <= 6.5) return '#4ade80';
+      if (ph <= 7.0) return '#22c55e';
+      if (ph <= 7.5) return '#3b82f6';
+      return '#8b5cf6';
+    }
+
+    function getPhLabel(ph) {
+      if (ph < 5.5) return 'Muy acido';
+      if (ph < 6.0) return 'Acido';
+      if (ph <= 7.0) return 'Optimo para hidroponia';
+      if (ph <= 7.5) return 'Ligeramente alcalino';
+      return 'Alcalino';
+    }
+
     function updateUI() {
+      // pH
+      const phVal = document.getElementById('phValue');
+      const phVolt = document.getElementById('phVoltage');
+      const phMarker = document.getElementById('phMarker');
+      const phStatus = document.getElementById('phStatus');
+      const ph = state.ph;
+      phVal.textContent = ph > 0 ? ph.toFixed(1) : '--';
+      phVal.style.color = ph > 0 ? getPhColor(ph) : '#8ab4c4';
+      phVolt.textContent = 'Voltaje: ' + (state.phV > 0 ? state.phV.toFixed(3) : '--') + ' V';
+      phMarker.style.left = (Math.min(Math.max(ph, 0), 14) / 14 * 100) + '%';
+      phStatus.textContent = ph > 0 ? getPhLabel(ph) : (state.adsOk ? 'Leyendo...' : 'Sensor no detectado');
+      phStatus.style.color = ph > 0 ? getPhColor(ph) : '#f87171';
+
       // Bomba principal
       const pDot = document.getElementById('pumpDot');
       const pText = document.getElementById('pumpText');
@@ -356,7 +495,7 @@ const char INDEX_HTML[] PROGMEM = R"rawliteral(
     }
 
     fetchState();
-    setInterval(fetchState, 5000);
+    setInterval(fetchState, 3000);
   </script>
 </body>
 </html>
@@ -494,6 +633,9 @@ String buildStateJson() {
   return "{\"pump\":" + String(pumpState ? "true" : "false") +
          ",\"peri1\":" + String(peri1State ? "true" : "false") +
          ",\"peri2\":" + String(peri2State ? "true" : "false") +
+         ",\"ph\":" + String(currentPH, 2) +
+         ",\"phV\":" + String(currentVoltage, 3) +
+         ",\"adsOk\":" + String(adsReady ? "true" : "false") +
          ",\"wifi\":\"" + WiFi.SSID() + "\"" +
          ",\"ip\":\"" + WiFi.localIP().toString() + "\"}";
 }
@@ -570,6 +712,32 @@ void setup() {
   digitalWrite(PERISTALTIC_2_PIN, LOW);
   pinMode(WIFI_RESET_PIN, INPUT_PULLUP);
 
+  Wire.begin(I2C_SDA, I2C_SCL);
+
+  Serial.println("Escaneando dispositivos I2C...");
+  int devicesFound = 0;
+  for (uint8_t addr = 1; addr < 127; addr++) {
+    Wire.beginTransmission(addr);
+    if (Wire.endTransmission() == 0) {
+      Serial.printf("  Dispositivo I2C encontrado en 0x%02X\n", addr);
+      devicesFound++;
+    }
+  }
+  if (devicesFound == 0) {
+    Serial.println("  Ningun dispositivo I2C detectado! Verificar cableado SDA(21)/SCL(22).");
+  }
+
+  ads.setGain(GAIN_ONE);
+  if (ads.begin()) {
+    adsReady = true;
+    Serial.println("ADS1115 OK en direccion 0x48");
+  } else {
+    Serial.println("ADS1115 no detectado. Usando lectura directa por GPIO34.");
+    Serial.println("  Conectar Po del PH-4502C -> P34 del ESP32");
+    analogReadResolution(12);
+    analogSetAttenuation(ADC_11db);
+  }
+
   loadWiFiCredentials();
 
   if (savedSSID.length() > 0) {
@@ -599,6 +767,7 @@ void loop() {
     return;
   }
 
+  updatePH();
   checkResetButton();
 
   if (WiFi.status() != WL_CONNECTED) {
