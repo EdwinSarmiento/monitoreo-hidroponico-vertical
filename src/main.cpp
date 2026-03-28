@@ -24,30 +24,24 @@ float currentVoltage = 0.0;
 unsigned long lastPHRead = 0;
 
 // =============================================
-//  Lectura de pH (ADS1115 o directo por GPIO)
+//  Lectura de pH (ADS1115 por I2C)
 // =============================================
-#define PH_DIRECT_PIN 34
-
 float readPHVoltage() {
-  if (adsReady) {
-    long total = 0;
-    for (int i = 0; i < PH_SAMPLES; i++) {
-      int16_t raw = ads.readADC_SingleEnded(PH_ADS_CHANNEL);
-      total += raw;
-      delay(10);
-    }
-    float avgRaw = (float)total / PH_SAMPLES;
-    return ads.computeVolts(avgRaw);
-  }
+  if (!adsReady) return 0.0f;
 
-  // Lectura directa por GPIO34 (sin ADS1115)
   long total = 0;
+  int validSamples = 0;
   for (int i = 0; i < PH_SAMPLES; i++) {
-    total += analogRead(PH_DIRECT_PIN);
+    int16_t raw = ads.readADC_SingleEnded(PH_ADS_CHANNEL);
+    if (raw >= 0 && raw < 32767) {
+      total += raw;
+      validSamples++;
+    }
     delay(10);
   }
-  float avgRaw = (float)total / PH_SAMPLES;
-  return avgRaw * (3.3f / 4095.0f);
+  if (validSamples == 0) return 0.0f;
+  float avgRaw = (float)total / validSamples;
+  return ads.computeVolts(avgRaw);
 }
 
 float voltageToPH(float voltage) {
@@ -63,8 +57,7 @@ void updatePH() {
   lastPHRead = millis();
   currentVoltage = readPHVoltage();
   currentPH = voltageToPH(currentVoltage);
-  String source = adsReady ? "ADS1115" : "GPIO34";
-  Serial.printf("pH: %.2f (%.3fV) [%s]\n", currentPH, currentVoltage, source.c_str());
+  Serial.printf("pH: %.2f (%.3fV) [ADS1115]\n", currentPH, currentVoltage);
 }
 
 // =============================================
@@ -713,6 +706,7 @@ void setup() {
   pinMode(WIFI_RESET_PIN, INPUT_PULLUP);
 
   Wire.begin(I2C_SDA, I2C_SCL);
+  Wire.setTimeOut(50);
 
   Serial.println("Escaneando dispositivos I2C...");
   int devicesFound = 0;
@@ -731,11 +725,14 @@ void setup() {
   if (ads.begin()) {
     adsReady = true;
     Serial.println("ADS1115 OK en direccion 0x48");
+    Serial.println("Leyendo todos los canales del ADS1115:");
+    for (int ch = 0; ch < 4; ch++) {
+      int16_t raw = ads.readADC_SingleEnded(ch);
+      float volts = ads.computeVolts(raw);
+      Serial.printf("  Canal A%d: raw=%d  volts=%.4fV\n", ch, raw, volts);
+    }
   } else {
-    Serial.println("ADS1115 no detectado. Usando lectura directa por GPIO34.");
-    Serial.println("  Conectar Po del PH-4502C -> P34 del ESP32");
-    analogReadResolution(12);
-    analogSetAttenuation(ADC_11db);
+    Serial.println("ADS1115 no detectado! Verificar conexiones I2C y pin ADDR a GND.");
   }
 
   loadWiFiCredentials();
