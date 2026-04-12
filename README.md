@@ -88,16 +88,47 @@ FUENTE 12V 10A
     │                              PH-4502C V+
     │
     └── GND ───────────────────── GND común (ESP32, ADS1115, PH-4502C, relé)
-
-ESP32 GPIO27 ──── IN  Relé (bomba principal)
-ESP32 GPIO26 ──── IN  Driver bomba peristáltica pH+
-ESP32 GPIO25 ──── IN  Driver bomba peristáltica pH-
 ```
+
+## Mapeo de Pines GPIO (Hardware)
+
+Esta tabla detalla el uso actual de los pines del ESP32 DevKit v1:
+
+| Categoría | Pin GPIO | Función / Dispositivo | Estado |
+| :--- | :---: | :--- | :---: |
+| **Sistema** | `GND` | Tierra común (Bus GND) | Ocupado |
+| **Sistema** | `VIN (5V)` | Alimentación desde convertidor | Ocupado |
+| **Comunicación** | `GPIO 21` | I2C SDA (Datos ADS1115) | Ocupado |
+| **Comunicación** | `GPIO 22` | I2C SCL (Reloj ADS1115) | Ocupado |
+| **Control** | `GPIO 27` | Relé - Bomba de Agua Principal | Ocupado |
+| **Control** | `GPIO 26` | Bomba Peristáltica 1 (pH+) | Ocupado |
+| **Control** | `GPIO 25` | Bomba Peristáltica 2 (pH-) | Ocupado |
+| **Entrada** | `GPIO 0` | Botón BOOT (Reset WiFi) | Ocupado |
+| **Disponible** | `GPIO 4, 13, 14` | Pines digitales libres | **LIBRE** |
+| **Disponible** | `GPIO 32, 33` | Pines analógicos/digitales libres | **LIBRE** |
+| **Disponible** | `GPIO 34, 35` | Pines **solo entrada** | **LIBRE** |
+| **Disponible** | `GPIO 2` | LED interno (a veces usado) | **LIBRE** |
 
 **Conexión del relé (lado de potencia):**
 - COM → Cable positivo (+) de la bomba
 - NO (Normally Open) → Positivo (+) de la fuente 12V
 - El negativo (-) de la bomba va directo al negativo (-) de la fuente
+
+## Infraestructura y Puertos (Docker)
+
+Para el funcionamiento del sistema desacoplado, se utilizan los siguientes puertos:
+
+| Servicio | Puerto Externo | Puerto Interno | Uso |
+| :--- | :---: | :---: | :--- |
+| **MQTT Broker** | `1883` | `1883` | Conexión del hardware (ESP32) |
+| **MQTT WebSockets** | `9001` | `9001` | Conexión del Dashboard Web |
+| **Web UI (Nginx)** | `8080` | `80` | Acceso al panel de control |
+| **Config Portal** | `80` | `80` | Modo configuración del ESP32 |
+
+### Puertos Disponibles para Expansión
+- `3000`: Reservado para Grafana (Visualización).
+- `8086`: Reservado para InfluxDB (Historial).
+- `5432`: Reservado para PostgreSQL.
 
 ## Calibración del sensor de pH
 

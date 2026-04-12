@@ -1,0 +1,29 @@
+1776030896: mosquitto version 2.1.2 starting
+1776030896: Config loaded from /mosquitto/config/mosquitto.conf.
+1776030896: Bridge support available.
+1776030896: Persistence support available.
+1776030896: TLS support available.
+1776030896: TLS-PSK support available.
+1776030896: Websockets support available.
+1776030896: Opening ipv4 listen socket on port 1883.
+1776030896: Opening ipv6 listen socket on port 1883.
+1776030896: Opening ipv4 listen socket on port 9001.
+1776030896: Opening ipv6 listen socket on port 9001.
+1776030896: mosquitto version 2.1.2 running
+1776031986: mosquitto version 2.1.2 terminating
+1776031986: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1776031986: mosquitto version 2.1.2 starting
+1776031986: Config loaded from /mosquitto/config/mosquitto.conf.
+1776031986: Bridge support available.
+1776031986: Persistence support available.
+1776031986: TLS support available.
+1776031986: TLS-PSK support available.
+1776031986: Websockets support available.
+1776031986: Opening ipv4 listen socket on port 1883.
+1776031986: Opening ipv4 listen socket on port 9001.
+1776031986: mosquitto version 2.1.2 running
+1776032137: New connection from 192.168.65.1:16435 on port 9001.
+1776032137: New client connected from 192.168.65.1:16435 as web_ui_19de04 (p4, c1, k60).
+1776032327: New connection from 192.168.65.1:46515 on port 1883.
+1776032327: New client connected from 192.168.65.1:46515 as ESP32-Hidro-34:94:54:F3:CC:78 (p4, c1, k15).
+1776033787: Saving in-memory database to /mosquitto/data//mosquitto.db.

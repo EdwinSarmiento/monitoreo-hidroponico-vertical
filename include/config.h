@@ -30,4 +30,11 @@
 #define AP_NAME     "Hidroponia-Setup"
 #define AP_PASSWORD "hidroponia123"
 
+// =============================================
+//  Configuración MQTT
+// =============================================
+#define MQTT_SERVER "192.168.31.249" // IP real de tu Mac confirmada por ipconfig
+#define MQTT_PORT   1883
+#define DEVICE_TOKEN "esp32_hidro" // Debe coincidir con el de la UI
+
 #endif
