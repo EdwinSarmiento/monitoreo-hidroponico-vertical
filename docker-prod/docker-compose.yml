@@ -7,6 +7,9 @@
 #   3. docker compose --env-file .env up -d
 #
 # Credenciales: mismas en passwd, portal MQTT del ESP32 y web UI.
+#
+# Si mosquitto no arranca: docker logs mosquitto-broker-prod
+# (falta passwd, o Docker creó carpeta "passwd" en vez de archivo → borrarla y regenerar con el script).
 
 services:
   mosquitto:
@@ -23,12 +26,6 @@ services:
       - mosquitto-prod-log:/mosquitto/log
     networks:
       - hydroponics-prod
-    healthcheck:
-      test: ["CMD-SHELL", "pidof mosquitto || exit 1"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
 
   web-ui:
     image: nginx:alpine
@@ -39,8 +36,7 @@ services:
     volumes:
       - ../web-ui:/usr/share/nginx/html:ro
     depends_on:
-      mosquitto:
-        condition: service_healthy
+      - mosquitto
     networks:
       - hydroponics-prod
 
