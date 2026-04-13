@@ -37,4 +37,10 @@
 #define MQTT_PORT   1883
 #define DEVICE_TOKEN "esp32_hidro" // Debe coincidir con el de la UI
 
+// =============================================
+//  Credenciales Admin (Portal Interno)
+// =============================================
+#define ADMIN_USER "admin"
+#define ADMIN_PASS "admin"
+
 #endif

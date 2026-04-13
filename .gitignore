@@ -2,3 +2,7 @@
 .vscode
 .DS_Store
 *.txt
+
+# MQTT docker-prod: credenciales y entorno local
+docker-prod/mosquitto/config/passwd
+docker-prod/.env

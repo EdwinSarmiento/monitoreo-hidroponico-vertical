@@ -27,3 +27,56 @@
 1776032327: New connection from 192.168.65.1:46515 on port 1883.
 1776032327: New client connected from 192.168.65.1:46515 as ESP32-Hidro-34:94:54:F3:CC:78 (p4, c1, k15).
 1776033787: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1776035588: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1776037389: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1776038334: New connection from 192.168.65.1:46011 on port 1883.
+1776038334: Client ESP32-Hidro-34:94:54:F3:CC:78 [192.168.65.1:46515] disconnected: session taken over.
+1776038334: New client connected from 192.168.65.1:46011 as ESP32-Hidro-34:94:54:F3:CC:78 (p4, c1, k15).
+1776038391: New connection from 192.168.65.1:48687 on port 1883.
+1776038391: Client ESP32-Hidro-34:94:54:F3:CC:78 [192.168.65.1:46011] disconnected: session taken over.
+1776038391: New client connected from 192.168.65.1:48687 as ESP32-Hidro-34:94:54:F3:CC:78 (p4, c1, k15).
+1776038976: Client ESP32-Hidro-34:94:54:F3:CC:78 [192.168.65.1:48687] disconnected: exceeded timeout.
+1776039190: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1776040991: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1776042792: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1776044593: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1776046394: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1776048195: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1776049325: Client web_ui_19de04 [192.168.65.1:16435] disconnected: connection closed by client.
+1776049333: New connection from 192.168.65.1:34815 on port 9001.
+1776049333: New client connected from 192.168.65.1:34815 as web_ui_5ad3ad (p4, c1, k60).
+1776049345: New connection from 192.168.65.1:60881 on port 1883.
+1776049345: New client connected from 192.168.65.1:60881 as ESP32-34:94:54:F3:CC:78 (p4, c1, k15).
+1776049523: Client ESP32-34:94:54:F3:CC:78 [192.168.65.1:60881] disconnected: exceeded timeout.
+1776049527: New connection from 192.168.65.1:38051 on port 1883.
+1776049527: New client connected from 192.168.65.1:38051 as ESP32-34:94:54:F3:CC:78 (p4, c1, k15).
+1776049550: New connection from 192.168.65.1:29702 on port 1883.
+1776049550: Client ESP32-34:94:54:F3:CC:78 [192.168.65.1:38051] disconnected: session taken over.
+1776049550: New client connected from 192.168.65.1:29702 as ESP32-34:94:54:F3:CC:78 (p4, c1, k15).
+1776049710: Client ESP32-34:94:54:F3:CC:78 [192.168.65.1:29702] disconnected: exceeded timeout.
+1776049713: New connection from 192.168.65.1:40286 on port 1883.
+1776049713: New client connected from 192.168.65.1:40286 as ESP32-34:94:54:F3:CC:78 (p4, c1, k15).
+1776049737: New connection from 192.168.65.1:57514 on port 1883.
+1776049737: Client ESP32-34:94:54:F3:CC:78 [192.168.65.1:40286] disconnected: session taken over.
+1776049737: New client connected from 192.168.65.1:57514 as ESP32-34:94:54:F3:CC:78 (p4, c1, k15).
+1776049996: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1776050207: Client ESP32-34:94:54:F3:CC:78 [192.168.65.1:57514] disconnected: exceeded timeout.
+1776050207: New connection from 192.168.65.1:46175 on port 1883.
+1776050207: New client connected from 192.168.65.1:46175 as ESP32-34:94:54:F3:CC:78 (p4, c1, k15).
+1776050230: New connection from 192.168.65.1:56640 on port 1883.
+1776050230: Client ESP32-34:94:54:F3:CC:78 [192.168.65.1:46175] disconnected: session taken over.
+1776050230: New client connected from 192.168.65.1:56640 as ESP32-34:94:54:F3:CC:78 (p4, c1, k15).
+1776050755: Client ESP32-34:94:54:F3:CC:78 [192.168.65.1:56640] disconnected: exceeded timeout.
+1776050755: New connection from 192.168.65.1:39682 on port 1883.
+1776050755: New client connected from 192.168.65.1:39682 as ESP32-34:94:54:F3:CC:78 (p4, c1, k15).
+1776050784: New connection from 192.168.65.1:42079 on port 1883.
+1776050784: Client ESP32-34:94:54:F3:CC:78 [192.168.65.1:39682] disconnected: session taken over.
+1776050784: New client connected from 192.168.65.1:42079 as ESP32-34:94:54:F3:CC:78 (p4, c1, k15).
+1776050816: Client ESP32-34:94:54:F3:CC:78 [192.168.65.1:42079] disconnected: connection closed by client.
+1776050816: New connection from 192.168.65.1:45005 on port 1883.
+1776050816: New client connected from 192.168.65.1:45005 as ESP32-34:94:54:F3:CC:78 (p4, c1, k15).
+1776050977: New connection from 192.168.65.1:56378 on port 1883.
+1776050977: Client ESP32-34:94:54:F3:CC:78 [192.168.65.1:45005] disconnected: session taken over.
+1776050977: New client connected from 192.168.65.1:56378 as ESP32-34:94:54:F3:CC:78 (p4, c1, k15).
+1776051216: Client ESP32-34:94:54:F3:CC:78 [192.168.65.1:56378] disconnected: exceeded timeout.
+1776051797: Saving in-memory database to /mosquitto/data//mosquitto.db.

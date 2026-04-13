@@ -16,6 +16,8 @@ const peri2Btn = document.getElementById('peri2-btn');
 // Load saved config
 document.getElementById('broker-host').value = localStorage.getItem('mqtt_host') || '';
 document.getElementById('device-token').value = localStorage.getItem('mqtt_token') || 'esp32_hidro';
+document.getElementById('mqtt-user').value = localStorage.getItem('mqtt_user') || '';
+document.getElementById('mqtt-pass').value = localStorage.getItem('mqtt_pass') || '';
 
 function addLog(msg, type = 'system') {
     const entry = document.createElement('div');
@@ -36,20 +38,27 @@ function connect() {
     }
 
     currentDeviceToken = token;
+    const mqttUser = document.getElementById('mqtt-user').value.trim();
+    const mqttPass = document.getElementById('mqtt-pass').value;
     localStorage.setItem('mqtt_host', host);
     localStorage.setItem('mqtt_token', token);
+    localStorage.setItem('mqtt_user', mqttUser);
+    localStorage.setItem('mqtt_pass', mqttPass);
 
     if (client) {
         client.end();
     }
 
     addLog(`Conectando al servidor ws://${host}:9001...`);
-    
-    // Connect via WebSockets
-    client = mqtt.connect(`ws://${host}:9001`, {
+    const wsOpts = {
         clientId: 'web_ui_' + Math.random().toString(16).substring(2, 8),
         keepalive: 60,
-    });
+    };
+    if (mqttUser) {
+        wsOpts.username = mqttUser;
+        wsOpts.password = mqttPass;
+    }
+    client = mqtt.connect(`ws://${host}:9001`, wsOpts);
 
     client.on('connect', () => {
         addLog('Conectado al Broker MQTT!', 'in');
