@@ -12,6 +12,10 @@ const pumpToggle = document.getElementById('pump-toggle');
 const pumpStatus = document.getElementById('pump-status');
 const peri1Btn = document.getElementById('peri1-btn');
 const peri2Btn = document.getElementById('peri2-btn');
+const tempValue = document.getElementById('temp-value');
+const humValue = document.getElementById('hum-value');
+const levelBadge = document.getElementById('level-badge');
+const levelDesc = document.getElementById('level-desc');
 
 // Load saved config
 document.getElementById('broker-host').value = localStorage.getItem('mqtt_host') || '';
@@ -116,6 +120,21 @@ function updateUI(data) {
     if (data.peri2 !== undefined) {
         peri2Btn.className = `btn-circular btn-red ${data.peri2 ? 'active' : ''}`;
         peri2Btn.textContent = data.peri2 ? 'OFF' : 'ON';
+    }
+
+    if (data.temp !== undefined) {
+        tempValue.textContent = data.temp.toFixed(1);
+    }
+
+    if (data.hum !== undefined) {
+        humValue.textContent = data.hum.toFixed(1);
+    }
+
+    if (data.level !== undefined) {
+        const isLow = data.level === 'LOW';
+        levelBadge.textContent = isLow ? 'BAJO' : 'OPTIMO';
+        levelBadge.className = `badge ${isLow ? 'low' : 'ok'}`;
+        levelDesc.textContent = isLow ? '¡ALERTA! Depósito de agua casi vacío.' : 'Depósito con agua suficiente.';
     }
 }
 

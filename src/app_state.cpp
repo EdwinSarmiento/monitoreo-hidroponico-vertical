@@ -16,7 +16,13 @@ bool mqttConfigured = false;
 
 float currentPH = 0.0f;
 float currentVoltage = 0.0f;
+float currentTemp = 0.0f;
+float currentHum = 0.0f;
+bool isLevelLow = false;
+
 unsigned long lastPHRead = 0;
+unsigned long lastEnvRead = 0;
+unsigned long lastLevelCheck = 0;
 unsigned long lastMQTTPublish = 0;
 
 String mqttServer = "";

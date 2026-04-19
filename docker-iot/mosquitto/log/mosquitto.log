@@ -80,3 +80,13 @@
 1776050977: New client connected from 192.168.65.1:56378 as ESP32-34:94:54:F3:CC:78 (p4, c1, k15).
 1776051216: Client ESP32-34:94:54:F3:CC:78 [192.168.65.1:56378] disconnected: exceeded timeout.
 1776051797: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1776553940: mosquitto version 2.1.2 starting
+1776553940: Config loaded from /mosquitto/config/mosquitto.conf.
+1776553940: Bridge support available.
+1776553940: Persistence support available.
+1776553940: TLS support available.
+1776553940: TLS-PSK support available.
+1776553940: Websockets support available.
+1776553940: Opening ipv4 listen socket on port 1883.
+1776553940: Opening ipv4 listen socket on port 9001.
+1776553940: mosquitto version 2.1.2 running

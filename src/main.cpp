@@ -15,6 +15,8 @@
 #include "portal_admin.h"
 #include "boot_reset.h"
 #include "wifi_connect.h"
+#include "dht_sensor.h"
+#include "level_sensor.h"
 
 void setup() {
   Serial.begin(115200);
@@ -66,6 +68,9 @@ void setup() {
     Serial.println("ADS1115 no detectado! Verificar conexiones I2C y pin ADDR a GND.");
   }
 
+  setupDHT();
+  setupLevelSensor();
+
   loadWiFiCredentials();
   loadMQTTConfig();
 
@@ -104,6 +109,8 @@ void loop() {
   }
 
   updatePH();
+  updateDHT();
+  updateLevelSensor();
 
   if (mqttConfigured) {
     if (!mqttClient.connected()) {

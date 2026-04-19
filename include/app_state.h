@@ -28,7 +28,12 @@ extern bool mqttConfigured;
 
 extern float currentPH;
 extern float currentVoltage;
+extern float currentTemp;
+extern float currentHum;
+extern bool isLevelLow;
 extern unsigned long lastPHRead;
+extern unsigned long lastEnvRead;
+extern unsigned long lastLevelCheck;
 extern unsigned long lastMQTTPublish;
 
 extern String mqttServer;

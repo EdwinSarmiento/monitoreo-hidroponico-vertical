@@ -50,6 +50,9 @@ void publishMQTT() {
   doc["pump"] = pumpState;
   doc["peri1"] = peri1State;
   doc["peri2"] = peri2State;
+  doc["temp"] = currentTemp;
+  doc["hum"] = currentHum;
+  doc["level"] = isLevelLow ? "LOW" : "OK";
   doc["ip"] = WiFi.localIP().toString();
   doc["rssi"] = WiFi.RSSI();
   doc["adsOk"] = adsReady;

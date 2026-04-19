@@ -50,6 +50,34 @@
                     <div class="sensor-meta" id="ph-voltage">Voltaje: -- V</div>
                 </div>
 
+                <!-- Tarjeta Ambiente -->
+                <div class="card sensor-card ambient">
+                    <div class="card-header">
+                        <span class="label">Ambiente</span>
+                    </div>
+                    <div class="ambient-values">
+                        <div class="val-group">
+                            <span id="temp-value">--</span><span class="unit">°C</span>
+                            <div class="label-sub">Temperatura</div>
+                        </div>
+                        <div class="val-group">
+                            <span id="hum-value">--</span><span class="unit">%</span>
+                            <div class="label-sub">Humedad</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta Nivel de Agua -->
+                <div class="card sensor-card level">
+                    <div class="card-header">
+                        <span class="label">Nivel de Agua</span>
+                    </div>
+                    <div class="level-indicator">
+                        <div id="level-badge" class="badge ok">OPTIMO</div>
+                    </div>
+                    <p class="control-desc" id="level-desc">Depósito con agua suficiente.</p>
+                </div>
+
                 <!-- Tarjeta Bomba Principal -->
                 <div class="card control-card">
                     <div class="card-header">
