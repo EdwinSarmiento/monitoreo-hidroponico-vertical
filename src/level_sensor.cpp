@@ -13,13 +13,13 @@ void updateLevelSensor() {
     if (millis() - lastLevelCheck < 1000) return;
     lastLevelCheck = millis();
 
-    // El sensor cierra el circuito a GND cuando el nivel es BAJO (depende del modelo, ajustable)
-    // Usamos digitalRead. LOW = Activado (Nivel bajo detectado)
+    // El sensor cierra el circuito a GND cuando el nivel es ALTO (tanque lleno)
+    // Usamos digitalRead con INPUT_PULLUP:
+    //   LOW  = contacto cerrado = tanque lleno  (nivel OK)
+    //   HIGH = contacto abierto = tanque vacío  (nivel bajo)
     bool rawState = digitalRead(LEVEL_SENSOR_PIN);
     
-    // Si el flotador está configurado para abrirse cuando el nivel baja:
-    // Aquí asumimos lógica inversa por el Pull-up (LOW = contacto cerrado)
-    isLevelLow = (rawState == LOW);
+    isLevelLow = (rawState == HIGH);
 
     if (isLevelLow) {
         // Podríamos apagar la bomba aquí por seguridad si quisiéramos

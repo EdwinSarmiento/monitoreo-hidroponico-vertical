@@ -1,0 +1,99 @@
+1777151058: mosquitto version 2.1.2 starting
+1777151058: Config loaded from /mosquitto/config/mosquitto.conf.
+1777151058: Bridge support available.
+1777151058: Persistence support available.
+1777151058: TLS support available.
+1777151058: TLS-PSK support available.
+1777151058: Websockets support available.
+1777151058: Opening ipv4 listen socket on port 1883.
+1777151058: Opening ipv4 listen socket on port 9001.
+1777151058: mosquitto version 2.1.2 running
+1777151059: New connection from 192.168.65.1:50996 on port 1883.
+1777151059: New client connected from 192.168.65.1:50996 as ESP32-B0:A7:32:2B:2B:A4 (p4, c1, k15).
+1777151060: New connection from 192.168.65.1:65528 on port 9001.
+1777151060: New client connected from 192.168.65.1:65528 as web_ui_e673d7 (p4, c1, k60).
+1777151062: New connection from 192.168.65.1:46593 on port 9001.
+1777151062: Client web_ui_e673d7 [192.168.65.1:65528] disconnected: session taken over.
+1777151062: New client connected from 192.168.65.1:46593 as web_ui_e673d7 (p4, c1, k60).
+1777151064: New connection from 192.168.65.1:41645 on port 9001.
+1777151064: Client web_ui_e673d7 [192.168.65.1:46593] disconnected: session taken over.
+1777151064: New client connected from 192.168.65.1:41645 as web_ui_e673d7 (p4, c1, k60).
+1777151066: New connection from 192.168.65.1:25275 on port 9001.
+1777151066: Client web_ui_e673d7 [192.168.65.1:41645] disconnected: session taken over.
+1777151066: New client connected from 192.168.65.1:25275 as web_ui_e673d7 (p4, c1, k60).
+1777151068: New connection from 192.168.65.1:37613 on port 9001.
+1777151068: Client web_ui_e673d7 [192.168.65.1:25275] disconnected: session taken over.
+1777151068: New client connected from 192.168.65.1:37613 as web_ui_e673d7 (p4, c1, k60).
+1777151070: New connection from 192.168.65.1:18655 on port 9001.
+1777151070: Client web_ui_e673d7 [192.168.65.1:37613] disconnected: session taken over.
+1777151070: New client connected from 192.168.65.1:18655 as web_ui_e673d7 (p4, c1, k60).
+1777151072: New connection from 192.168.65.1:28180 on port 9001.
+1777151072: Client web_ui_e673d7 [192.168.65.1:18655] disconnected: session taken over.
+1777151072: New client connected from 192.168.65.1:28180 as web_ui_e673d7 (p4, c1, k60).
+1777151074: New connection from 192.168.65.1:39846 on port 9001.
+1777151074: Client web_ui_e673d7 [192.168.65.1:28180] disconnected: session taken over.
+1777151074: New client connected from 192.168.65.1:39846 as web_ui_e673d7 (p4, c1, k60).
+1777151075: New connection from 192.168.65.1:20910 on port 9001.
+1777151076: Client web_ui_e673d7 [192.168.65.1:39846] disconnected: session taken over.
+1777151076: New client connected from 192.168.65.1:20910 as web_ui_e673d7 (p4, c1, k60).
+1777151077: New connection from 192.168.65.1:62323 on port 9001.
+1777151077: Client web_ui_e673d7 [192.168.65.1:20910] disconnected: session taken over.
+1777151077: New client connected from 192.168.65.1:62323 as web_ui_e673d7 (p4, c1, k60).
+1777151078: New connection from 192.168.65.1:55351 on port 9001.
+1777151078: Client web_ui_e673d7 [192.168.65.1:62323] disconnected: session taken over.
+1777151078: New client connected from 192.168.65.1:55351 as web_ui_e673d7 (p4, c1, k60).
+1777151079: New connection from 192.168.65.1:61161 on port 9001.
+1777151079: Client web_ui_e673d7 [192.168.65.1:55351] disconnected: session taken over.
+1777151079: New client connected from 192.168.65.1:61161 as web_ui_e673d7 (p4, c1, k60).
+1777151079: Client web_ui_e673d7 [192.168.65.1:61161] disconnected: connection closed by client.
+1777151081: New connection from 192.168.65.1:62184 on port 9001.
+1777151081: New client connected from 192.168.65.1:62184 as web_ui_ec5613 (p4, c1, k60).
+1777151248: Client ESP32-B0:A7:32:2B:2B:A4 [192.168.65.1:50996] disconnected: exceeded timeout.
+1777151320: New connection from 192.168.65.1:47729 on port 1883.
+1777151320: New client connected from 192.168.65.1:47729 as ESP32-B0:A7:32:2B:2B:A4 (p4, c1, k15).
+1777151321: Client web_ui_ec5613 [192.168.65.1:62184] disconnected: connection closed by client.
+1777151327: Client ESP32-B0:A7:32:2B:2B:A4 [192.168.65.1:47729] disconnected.
+1777151327: New connection from 192.168.65.1:41084 on port 1883.
+1777151327: New client connected from 192.168.65.1:41084 as ESP32-B0:A7:32:2B:2B:A4 (p4, c1, k15).
+1777151359: New connection from 192.168.65.1:46735 on port 9001.
+1777151359: New client connected from 192.168.65.1:46735 as web_ui_cc0fc7 (p4, c1, k60).
+1777151441: Client ESP32-B0:A7:32:2B:2B:A4 [192.168.65.1:41084] disconnected: exceeded timeout.
+1777151502: New connection from 192.168.65.1:51064 on port 1883.
+1777151502: New client connected from 192.168.65.1:51064 as ESP32-B0:A7:32:2B:2B:A4 (p4, c1, k15).
+1777151509: Client ESP32-B0:A7:32:2B:2B:A4 [192.168.65.1:51064] disconnected: connection closed by client.
+1777151509: New connection from 192.168.65.1:48131 on port 1883.
+1777151509: New client connected from 192.168.65.1:48131 as ESP32-B0:A7:32:2B:2B:A4 (p4, c1, k15).
+1777151583: Client ESP32-B0:A7:32:2B:2B:A4 [192.168.65.1:48131] disconnected: exceeded timeout.
+1777151589: New connection from 192.168.65.1:59958 on port 1883.
+1777151589: New client connected from 192.168.65.1:59958 as ESP32-B0:A7:32:2B:2B:A4 (p4, c1, k15).
+1777151642: Client ESP32-B0:A7:32:2B:2B:A4 [192.168.65.1:59958] disconnected: exceeded timeout.
+1777151652: New connection from 192.168.65.1:26248 on port 1883.
+1777151652: New client connected from 192.168.65.1:26248 as ESP32-B0:A7:32:2B:2B:A4 (p4, c1, k15).
+1777151672: Client web_ui_cc0fc7 [192.168.65.1:46735] disconnected.
+1777151672: New connection from 192.168.65.1:55241 on port 9001.
+1777151672: New client connected from 192.168.65.1:55241 as web_ui_963aae (p4, c1, k60).
+1777151927: Client web_ui_963aae [192.168.65.1:55241] disconnected: connection closed by client.
+1777151928: New connection from 192.168.65.1:25311 on port 9001.
+1777151928: New client connected from 192.168.65.1:25311 as web_ui_963aae (p4, c1, k60).
+1777152859: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1777153082: Client web_ui_963aae [192.168.65.1:25311] disconnected: connection closed by client.
+1777153083: New connection from 192.168.65.1:27280 on port 9001.
+1777153083: New client connected from 192.168.65.1:27280 as web_ui_963aae (p4, c1, k60).
+1777153116: New connection from 192.168.65.1:55885 on port 1883.
+1777153116: Client ESP32-B0:A7:32:2B:2B:A4 [192.168.65.1:26248] disconnected: session taken over.
+1777153116: New client connected from 192.168.65.1:55885 as ESP32-B0:A7:32:2B:2B:A4 (p4, c1, k15).
+1777153303: New connection from 192.168.65.1:53206 on port 1883.
+1777153303: Client ESP32-B0:A7:32:2B:2B:A4 [192.168.65.1:55885] disconnected: session taken over.
+1777153303: New client connected from 192.168.65.1:53206 as ESP32-B0:A7:32:2B:2B:A4 (p4, c1, k15).
+1777153312: New connection from 192.168.65.1:30365 on port 1883.
+1777153312: Client ESP32-B0:A7:32:2B:2B:A4 [192.168.65.1:53206] disconnected: session taken over.
+1777153312: New client connected from 192.168.65.1:30365 as ESP32-B0:A7:32:2B:2B:A4 (p4, c1, k15).
+1777153321: Client ESP32-B0:A7:32:2B:2B:A4 [192.168.65.1:30365] disconnected: connection closed by client.
+1777153322: New connection from 192.168.65.1:39986 on port 1883.
+1777153322: New client connected from 192.168.65.1:39986 as ESP32-B0:A7:32:2B:2B:A4 (p4, c1, k15).
+1777153613: Client web_ui_963aae [192.168.65.1:27280] disconnected: connection closed by client.
+1777153614: New connection from 192.168.65.1:51901 on port 9001.
+1777153614: New client connected from 192.168.65.1:51901 as web_ui_963aae (p4, c1, k60).
+1777153656: Client ESP32-B0:A7:32:2B:2B:A4 [192.168.65.1:39986] disconnected: exceeded timeout.
+1777153657: New connection from 192.168.65.1:48558 on port 1883.
+1777153657: New client connected from 192.168.65.1:48558 as ESP32-B0:A7:32:2B:2B:A4 (p4, c1, k15).

@@ -21,7 +21,6 @@ services:
       - "${MQTT_WS_PORT:-9001}:9001"
     volumes:
       - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
-      - ./mosquitto/config/passwd:/mosquitto/config/passwd:ro
       - mosquitto-prod-data:/mosquitto/data
       - mosquitto-prod-log:/mosquitto/log
     networks:
