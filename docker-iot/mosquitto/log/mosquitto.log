@@ -90,3 +90,30 @@
 1776553940: Opening ipv4 listen socket on port 1883.
 1776553940: Opening ipv4 listen socket on port 9001.
 1776553940: mosquitto version 2.1.2 running
+1776554151: mosquitto version 2.1.2 starting
+1776554151: Config loaded from /mosquitto/config/mosquitto.conf.
+1776554151: Bridge support available.
+1776554151: Persistence support available.
+1776554151: TLS support available.
+1776554151: TLS-PSK support available.
+1776554151: Websockets support available.
+1776554151: Opening ipv4 listen socket on port 1883.
+1776554151: Opening ipv4 listen socket on port 9001.
+1776554151: mosquitto version 2.1.2 running
+1776554280: New connection from 172.18.0.1:60854 on port 9001.
+1776554280: New client connected from 172.18.0.1:60854 as web_ui_a1d5b8 (p4, c1, k60).
+1776554295: New connection from 172.18.0.1:36692 on port 9001.
+1776554295: Client web_ui_a1d5b8 [172.18.0.1:60854] disconnected.
+1776554295: New client connected from 172.18.0.1:36692 as web_ui_6a548b (p4, c1, k60).
+1776554337: Client web_ui_6a548b [172.18.0.1:36692] disconnected: connection closed by client.
+1776555952: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1776557753: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1776559554: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1776560070: New connection from 172.18.0.1:46766 on port 9001.
+1776560070: New client connected from 172.18.0.1:46766 as web_ui_edef84 (p4, c1, k60).
+1776560073: Client web_ui_edef84 [172.18.0.1:46766] disconnected: connection closed by client.
+1776561355: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1776563155: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1776564956: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1776566757: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1776568558: Saving in-memory database to /mosquitto/data//mosquitto.db.

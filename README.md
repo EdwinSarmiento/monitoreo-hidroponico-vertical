@@ -1,12 +1,16 @@
 # Hidroponia IoT - ESP32
 
-Sistema de control IoT para cultivo hidropónico basado en ESP32. Monitorea el pH del agua en tiempo real mediante un sensor PH-4502C con ADC externo ADS1115, y controla una bomba de agua principal junto con dos bombas peristálticas para regulación de pH, todo desde una interfaz web accesible por WiFi.
+Sistema de control IoT para cultivo hidropónico basado en ESP32. Monitorea el pH del agua en tiempo real mediante un sensor PH-4502C con ADC externo ADS1115, temperatura y humedad ambiental con sensor AM2305B, y nivel de agua con interruptor de flotador DPL-1-BK. Controla una bomba de agua principal junto con dos bombas peristálticas para regulación de pH, todo desde un dashboard web accesible por WiFi con alertas y registro histórico.
 
 ## Funcionalidades
 
 - **Sensor de pH con ADS1115** — Lectura de alta precisión (16-bit) vía I2C con promedio de 10 muestras y validación de datos
+- **Sensor de temperatura y humedad (AM2305B)** — Lectura ambiental cada 5 segundos vía protocolo DHT21 (GPIO17)
+- **Sensor de nivel de agua (DPL-1-BK)** — Interruptor de flotador para detectar nivel bajo (GPIO16)
+- **Alerta de nivel bajo** — Banner visual con sonido cuando el nivel de agua baja, silenciable por 5 minutos
+- **Historial de humedad** — Registro diario (mín/máx/promedio) almacenado localmente hasta 30 días
 - **WiFi auto-configurable** — Portal cautivo para configurar la red desde el celular, sin credenciales hardcodeadas
-- **Panel web responsive** — Interfaz moderna con gauge de pH en tiempo real, voltaje, estado de bombas y controles
+- **Dashboard web responsive** — Interfaz moderna con gauge de pH, ambiente, nivel de agua, controles y tabla histórica
 - **Bomba de agua principal** — Control ON/OFF por relé (GPIO27)
 - **Bombas peristálticas de pH** — Control independiente de pH+ (subir) y pH- (bajar)
 - **Reset WiFi** — Desde la interfaz web o manteniendo el botón BOOT del ESP32 por 3 segundos
@@ -26,6 +30,8 @@ Sistema de control IoT para cultivo hidropónico basado en ESP32. Monitorea el p
 | Bomba peristáltica | Para regulación pH | 2 |
 | Módulo sensor pH | PH-4502C con electrodo E201-BNC | 1 |
 | ADC 16-bit | ADS1115 (I2C, dirección 0x48) | 1 |
+| Sensor temp/humedad | AM2305B (protocolo DHT21) | 1 |
+| Sensor de nivel | DPL-1-BK (interruptor de flotador) | 1 |
 | Soluciones buffer | pH 4.0 y pH 7.0 (para calibración) | 1 kit |
 
 ## Pines GPIO
@@ -37,6 +43,8 @@ Sistema de control IoT para cultivo hidropónico basado en ESP32. Monitorea el p
 | GPIO25 | Bomba peristáltica pH- (bajar) |
 | GPIO21 | I2C SDA → ADS1115 |
 | GPIO22 | I2C SCL → ADS1115 |
+| GPIO17 | Datos → Sensor AM2305B (Temp/Humedad) |
+| GPIO16 | Señal → Flotador DPL-1-BK (Nivel de agua) |
 | GPIO0  | Botón BOOT → Reset WiFi (mantener 3s) |
 
 ## Esquema de conexión
@@ -77,6 +85,29 @@ ALRT         ────    (sin conectar, no necesario para polling)
 
 > **Importante:** El ADS1115 se alimenta con **3.3V** del ESP32 (no 5V). Si se alimenta con 5V, las líneas I2C envían 5V a los GPIO del ESP32 que solo toleran 3.3V, lo que puede dañar el microcontrolador. El módulo PH-4502C sí necesita 5V para funcionar correctamente.
 
+### Sensor de temperatura y humedad (AM2305B)
+
+```
+AM2305B              ESP32
+─────────            ──────
+VCC (rojo)   ────    3.3V (pin 3V3)
+GND (negro)  ────    GND
+DATA (amarillo) ──   GPIO17
+```
+
+> **Nota:** El AM2305B utiliza el protocolo DHT21. Algunos modelos incluyen resistencia pull-up interna; si la lectura es inestable, agregar una resistencia de 4.7kΩ entre DATA y VCC.
+
+### Sensor de nivel de agua (DPL-1-BK)
+
+```
+DPL-1-BK             ESP32
+─────────            ──────
+Cable 1      ────    GPIO16
+Cable 2      ────    GND
+```
+
+> **Funcionamiento:** El flotador es un interruptor reed (ON/OFF). Cuando el nivel baja, el flotador cierra el circuito a GND → el ESP32 lee `LOW` en GPIO16 (configurado como `INPUT_PULLUP`). Solo reporta dos estados: nivel OK o nivel BAJO.
+
 ### Bombas y relé
 
 ```
@@ -87,7 +118,7 @@ FUENTE 12V 10A
     ├── Convertidor 12V → 5V ──── ESP32 VIN (5V)
     │                              PH-4502C V+
     │
-    └── GND ───────────────────── GND común (ESP32, ADS1115, PH-4502C, relé)
+    └── GND ───────────────────── GND común (ESP32, ADS1115, PH-4502C, relé, AM2305B, DPL-1-BK)
 ```
 
 ## Mapeo de Pines GPIO (Hardware)
@@ -103,6 +134,8 @@ Esta tabla detalla el uso actual de los pines del ESP32 DevKit v1:
 | **Control** | `GPIO 27` | Relé - Bomba de Agua Principal | Ocupado |
 | **Control** | `GPIO 26` | Bomba Peristáltica 1 (pH+) | Ocupado |
 | **Control** | `GPIO 25` | Bomba Peristáltica 2 (pH-) | Ocupado |
+| **Sensor** | `GPIO 17` | AM2305B - Temperatura/Humedad | Ocupado |
+| **Sensor** | `GPIO 16` | DPL-1-BK - Nivel de Agua | Ocupado |
 | **Entrada** | `GPIO 0` | Botón BOOT (Reset WiFi) | Ocupado |
 | **Disponible** | `GPIO 4, 13, 14` | Pines digitales libres | **LIBRE** |
 | **Disponible** | `GPIO 32, 33` | Pines analógicos/digitales libres | **LIBRE** |
@@ -257,14 +290,40 @@ pH: 6.51 (1.378V) [ADS1115]
 ## Estructura del proyecto
 
 ```
-esp32/
+hydroponics-iot-ph-controller/
 ├── platformio.ini              # Configuración PlatformIO y dependencias
 ├── include/
-│   └── config.h                # Pines GPIO, calibración pH, config AP
+│   ├── config.h                # Pines GPIO, calibración pH, config AP
+│   ├── app_state.h             # Variables de estado compartidas
+│   ├── dht_sensor.h            # Sensor AM2305B (temp/humedad)
+│   ├── level_sensor.h          # Sensor DPL-1-BK (nivel de agua)
+│   ├── ph_sensor.h             # Sensor de pH (ADS1115)
+│   ├── hidro_mqtt.h            # Cliente MQTT
+│   ├── actuators.h             # Bombas y relés
+│   ├── portal_wifi.h           # Portal cautivo WiFi
+│   ├── portal_admin.h          # Panel admin
+│   ├── storage.h               # Persistencia NVS
+│   ├── boot_reset.h            # Reset por botón BOOT
+│   └── wifi_connect.h          # Conexión WiFi
 ├── src/
-│   └── main.cpp                # Código principal (WiFi, web server, pH, bombas)
-├── bitacora-2026-03-23.txt     # Bitácora sesión 1 (setup inicial, GPIO34)
-├── bitacora-2026-03-25.txt     # Bitácora sesión 2 (integración ADS1115)
+│   ├── main.cpp                # Orquestación principal
+│   ├── dht_sensor.cpp          # Lectura AM2305B
+│   ├── level_sensor.cpp        # Lectura flotador DPL-1-BK
+│   ├── ph_sensor.cpp           # Lectura pH vía ADS1115
+│   ├── hidro_mqtt.cpp          # Publicación/suscripción MQTT
+│   ├── actuators.cpp           # Control de bombas
+│   ├── app_state.cpp           # Variables globales
+│   ├── portal_admin.cpp        # Servidor web admin
+│   ├── portal_wifi.cpp         # Portal cautivo
+│   ├── storage.cpp             # Lectura/escritura NVS
+│   ├── boot_reset.cpp          # Monitor botón BOOT (Core 0)
+│   └── wifi_connect.cpp        # Conexión WiFi
+├── web-ui/
+│   ├── index.html              # Dashboard principal
+│   ├── app.js                  # Lógica MQTT, alertas, historial
+│   └── style.css               # Estilos del dashboard
+├── docker-iot/                 # Mosquitto + Web UI (desarrollo)
+├── docker-prod/                # Configuración producción
 └── README.md
 ```
 
@@ -275,6 +334,9 @@ esp32/
 | AsyncTCP | ^1.1.1 | TCP asíncrono para el servidor web |
 | ESPAsyncWebServer | ^1.2.4 | Servidor web HTTP asíncrono |
 | Adafruit ADS1X15 | ^2.5.0 | Driver del ADC ADS1115 (I2C) |
+| DHT sensor library | ^1.4.6 | Lectura del sensor AM2305B (DHT21) |
+| ArduinoJson | ^6.21.0 | Serialización JSON para MQTT |
+| PubSubClient | ^2.8 | Cliente MQTT |
 
 ## API REST (endpoints del ESP32)
 
@@ -293,11 +355,13 @@ esp32/
 - [x] Portal de configuración WiFi
 - [x] Diagnóstico I2C y lectura multi-canal al arranque
 - [x] Protección anti-bloqueo I2C (timeout)
+- [x] Sensor de temperatura y humedad ambiental (AM2305B)
+- [x] Sensor de nivel de agua (DPL-1-BK)
+- [x] Alerta visual y sonora de nivel bajo
+- [x] Historial de humedad con tabla diaria (30 días, localStorage)
 - [ ] Recalibrar pH con voltajes del ADS1115
-- [ ] Sensor de temperatura del agua
-- [ ] Sensor de nivel de agua
 - [ ] Sensor de EC (conductividad eléctrica)
 - [ ] Temporizador automático para la bomba
 - [ ] OTA (actualización remota por WiFi)
-- [ ] Dashboard con gráficos históricos
-- [ ] Alertas por MQTT / Telegram
+- [ ] Dashboard con gráficos históricos (Grafana + InfluxDB)
+- [ ] Alertas por Telegram

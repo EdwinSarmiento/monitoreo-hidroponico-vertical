@@ -8,6 +8,13 @@
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 </head>
 <body>
+    <!-- Alert Banner (hidden by default, shown when water level is LOW) -->
+    <div id="alert-banner" class="alert-banner">
+        <span class="alert-icon">⚠️</span>
+        <span class="alert-text">¡ALERTA! Nivel de agua bajo — Revise el depósito</span>
+        <button id="alert-dismiss" class="alert-dismiss">Silenciar</button>
+    </div>
+
     <div class="container">
         <header>
             <div class="logo">
@@ -113,6 +120,36 @@
                     <p class="control-desc">Ajuste químico mediante bombas peristálticas.</p>
                 </div>
             </div>
+
+            <!-- Historial de Humedad Ambiental -->
+            <section id="history-section" class="card history-section">
+                <div class="card-header">
+                    <div class="header-left">
+                        <span class="label">📊 Historial de Humedad Ambiental</span>
+                    </div>
+                    <div class="header-right">
+                        <span id="days-badge" class="days-badge">0/30 días</span>
+                        <button id="clear-history" class="btn-clear-history">Limpiar</button>
+                    </div>
+                </div>
+                <div class="history-table-wrapper">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Hum. Mín</th>
+                                <th>Hum. Máx</th>
+                                <th>Hum. Prom</th>
+                                <th>Temp. Prom</th>
+                                <th>Lecturas</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
 
             <!-- Terminal de Logs -->
             <section class="card terminal">

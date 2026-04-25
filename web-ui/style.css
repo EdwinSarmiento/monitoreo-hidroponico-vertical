@@ -109,8 +109,18 @@ header {
 
 .form-group {
     display: flex;
-    gap: 1rem;
+    flex-wrap: wrap;
+    gap: 0.8rem;
     margin: 1.2rem 0;
+}
+
+.form-group input {
+    min-width: 180px;
+}
+
+.form-group .btn {
+    flex-shrink: 0;
+    width: 100%;
 }
 
 input {
@@ -389,4 +399,224 @@ footer {
     border-radius: 50%;
     margin-right: 5px;
     animation: pulse 2s infinite;
+}
+
+/* =============================================
+   Water Level Alert Banner
+   ============================================= */
+.alert-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: rgba(248, 81, 73, 0.15);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(248, 81, 73, 0.4);
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    transform: translateY(-100%);
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.alert-banner.visible {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: all;
+}
+
+.alert-banner .alert-icon {
+    font-size: 1.5rem;
+    animation: alertPulse 1s infinite;
+}
+
+.alert-banner .alert-text {
+    color: #ff6b6b;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.02rem;
+}
+
+.alert-banner .alert-dismiss {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(248, 81, 73, 0.4);
+    color: #ff9b9b;
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05rem;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.alert-banner .alert-dismiss:hover {
+    background: rgba(248, 81, 73, 0.3);
+    transform: scale(1.05);
+}
+
+@keyframes alertPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.7; }
+}
+
+/* Push content down when alert is visible */
+body.alert-active {
+    padding-top: 60px;
+}
+
+/* =============================================
+   Humidity History Table
+   ============================================= */
+.history-section {
+    margin-bottom: 2rem;
+}
+
+.history-section .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
+}
+
+.history-section .header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.history-section .header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.days-badge {
+    background: rgba(56, 139, 253, 0.15);
+    color: #58a6ff;
+    border: 1px solid rgba(56, 139, 253, 0.3);
+    padding: 0.3rem 0.7rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.03rem;
+    white-space: nowrap;
+}
+
+.btn-clear-history {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 0.35rem 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.7rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-clear-history:hover {
+    border-color: var(--error-color);
+    color: var(--error-color);
+    background: rgba(248, 81, 73, 0.1);
+}
+
+.history-table-wrapper {
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.history-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.history-table th {
+    background: rgba(22, 27, 34, 0.95);
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06rem;
+    padding: 0.8rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.history-table td {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid rgba(48, 54, 61, 0.5);
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.history-table tbody tr {
+    transition: background 0.15s;
+}
+
+.history-table tbody tr:nth-child(even) {
+    background: rgba(22, 27, 34, 0.4);
+}
+
+.history-table tbody tr:hover {
+    background: rgba(56, 139, 253, 0.06);
+}
+
+.history-table .hum-min { color: #58a6ff; }
+.history-table .hum-max { color: #f85149; }
+.history-table .hum-avg { color: #4ade80; font-weight: 600; }
+.history-table .temp-avg { color: #d29922; }
+
+.history-empty {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.history-empty .empty-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    display: block;
+    opacity: 0.5;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .alert-banner {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding: 0.8rem 1rem;
+    }
+
+    .alert-banner .alert-text {
+        font-size: 0.8rem;
+    }
+
+    .history-table th,
+    .history-table td {
+        padding: 0.6rem 0.6rem;
+        font-size: 0.78rem;
+    }
+
+    .history-section .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.8rem;
+    }
 }
