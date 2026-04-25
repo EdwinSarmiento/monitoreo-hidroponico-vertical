@@ -1,0 +1,16 @@
+1777154673: mosquitto version 2.1.2 starting
+1777154673: Config loaded from /mosquitto/config/mosquitto.conf.
+1777154673: Bridge support available.
+1777154673: Persistence support available.
+1777154673: TLS support available.
+1777154673: TLS-PSK support available.
+1777154673: Websockets support available.
+1777154673: Opening ipv4 listen socket on port 1883.
+1777154673: Opening ipv4 listen socket on port 9001.
+1777154673: mosquitto version 2.1.2 running
+1777154673: New connection from 192.168.65.1:21592 on port 9001.
+1777154673: New client connected from 192.168.65.1:21592 as web_ui_c45d4b (p4, c1, k60).
+1777154673: New connection from 192.168.65.1:32850 on port 9001.
+1777154673: New client connected from 192.168.65.1:32850 as web_ui_963aae (p4, c1, k60).
+1777154674: New connection from 192.168.65.1:49647 on port 1883.
+1777154674: New client connected from 192.168.65.1:49647 as ESP32-B0:A7:32:2B:2B:A4 (p4, c1, k15).

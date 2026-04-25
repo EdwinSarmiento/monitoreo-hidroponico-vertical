@@ -31,11 +31,9 @@
                 <div class="form-group">
                     <input type="text" id="broker-host" placeholder="IP o host del broker (ej. mqtt.tudominio.com)" value="">
                     <input type="text" id="device-token" placeholder="Token / ID Dispositivo" value="esp32_hidro">
-                    <input type="text" id="mqtt-user" placeholder="Usuario MQTT (opcional; obligatorio en producción)" value="" autocomplete="username">
-                    <input type="password" id="mqtt-pass" placeholder="Contraseña MQTT (opcional)" value="" autocomplete="current-password">
                     <button id="connect-btn" class="btn primary">Conectar</button>
                 </div>
-                <p class="hint">Puerto WebSocket 9001. Con Mosquitto protegido, rellena usuario y contraseña.</p>
+                <p class="hint">Puerto WebSocket 9001. Conexión directa mediante MQTT sobre WebSockets.</p>
             </section>
 
             <!-- Grid de Sensores y Controles -->

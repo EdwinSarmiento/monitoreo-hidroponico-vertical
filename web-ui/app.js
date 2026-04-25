@@ -34,8 +34,6 @@ const daysBadge = document.getElementById('days-badge');
 // Load saved config
 document.getElementById('broker-host').value = localStorage.getItem('mqtt_host') || '';
 document.getElementById('device-token').value = localStorage.getItem('mqtt_token') || 'esp32_hidro';
-document.getElementById('mqtt-user').value = localStorage.getItem('mqtt_user') || '';
-document.getElementById('mqtt-pass').value = localStorage.getItem('mqtt_pass') || '';
 
 // =============================================
 //  Logging
@@ -62,12 +60,8 @@ function connect() {
     }
 
     currentDeviceToken = token;
-    const mqttUser = document.getElementById('mqtt-user').value.trim();
-    const mqttPass = document.getElementById('mqtt-pass').value;
     localStorage.setItem('mqtt_host', host);
     localStorage.setItem('mqtt_token', token);
-    localStorage.setItem('mqtt_user', mqttUser);
-    localStorage.setItem('mqtt_pass', mqttPass);
 
     if (client) {
         client.end();
@@ -78,10 +72,6 @@ function connect() {
         clientId: 'web_ui_' + Math.random().toString(16).substring(2, 8),
         keepalive: 60,
     };
-    if (mqttUser) {
-        wsOpts.username = mqttUser;
-        wsOpts.password = mqttPass;
-    }
     client = mqtt.connect(`ws://${host}:9001`, wsOpts);
 
     client.on('connect', () => {
