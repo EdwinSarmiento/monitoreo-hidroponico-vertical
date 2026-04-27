@@ -152,26 +152,14 @@ static const char MQTT_CONFIG_HTML[] PROGMEM = R"rawliteral(
       <div class="section-title">Conexi&oacute;n al Broker</div>
       <form action="/save-mqtt" method="POST">
         <div class="field">
-          <label>IP o Dominio del Servidor MQTT</label>
-          <input type="text" name="mqtt_server" value="{mqtt_server}" required placeholder="ej: 192.168.1.10 o mi-servidor.com">
-          <div class="hint">IP local para pruebas, IP publica o dominio para servidor en la nube.</div>
-        </div>
-        <div class="field">
-          <label>Puerto</label>
-          <input type="number" name="mqtt_port" value="{mqtt_port}" placeholder="1883">
+          <label>IP o Dominio del Servidor</label>
+          <input type="text" name="mqtt_server" value="{mqtt_server}" required placeholder="ej: 192.168.0.19 o mi-servidor.com">
+          <div class="hint">IP privada (red local) o IP p&uacute;blica / dominio para servidor en la nube.</div>
         </div>
         <div class="field">
           <label>Token del Dispositivo</label>
           <input type="text" name="device_token" value="{device_token}" placeholder="esp32_hidro">
-          <div class="hint">Debe coincidir con el que usas en el Dashboard web.</div>
-        </div>
-        <div class="field">
-          <label>Usuario MQTT (Opcional)</label>
-          <input type="text" name="mqtt_user" value="{mqtt_user}" placeholder="Dejar en blanco si no se requiere">
-        </div>
-        <div class="field">
-          <label>Contrase&ntilde;a MQTT (Opcional)</label>
-          <input type="password" name="mqtt_pass" placeholder="Dejar en blanco si no se requiere">
+          <div class="hint">Debe coincidir con el del Dashboard web (t&oacute;picos hidroponia/&lt;token&gt;/...).</div>
         </div>
         <button class="btn" type="submit">Guardar y Conectar</button>
       </form>
@@ -202,9 +190,7 @@ static String buildLoginPage(const String &msg) {
 static String buildMQTTPage() {
   String html = String(MQTT_CONFIG_HTML);
   html.replace("{mqtt_server}", mqttServer);
-  html.replace("{mqtt_port}", String(mqttPort));
   html.replace("{device_token}", deviceToken);
-  html.replace("{mqtt_user}", mqttUser);
   html.replace("{wifi}", WiFi.SSID());
   html.replace("{ip}", WiFi.localIP().toString());
 
@@ -241,18 +227,12 @@ void setupAppRoutes() {
     if (request->hasParam("mqtt_server", true)) {
       mqttServer = request->getParam("mqtt_server", true)->value();
     }
-    if (request->hasParam("mqtt_port", true)) {
-      mqttPort = request->getParam("mqtt_port", true)->value().toInt();
-    }
     if (request->hasParam("device_token", true)) {
       deviceToken = request->getParam("device_token", true)->value();
     }
-    if (request->hasParam("mqtt_user", true)) {
-      mqttUser = request->getParam("mqtt_user", true)->value();
-    }
-    if (request->hasParam("mqtt_pass", true) && request->getParam("mqtt_pass", true)->value() != "") {
-      mqttPass = request->getParam("mqtt_pass", true)->value();
-    }
+    mqttPort = 1883;
+    mqttUser = "";
+    mqttPass = "";
 
     saveMQTTConfig();
     mqttClient.disconnect();

@@ -25,15 +25,14 @@
         </header>
 
         <main>
-            <!-- Configuración de Conexión -->
+            <!-- Conexión al Broker -->
             <section class="config-card card">
-                <h3><span class="dot"></span> Configuración del Broker</h3>
+                <h3><span class="dot"></span> Broker MQTT</h3>
                 <div class="form-group">
-                    <input type="text" id="broker-host" placeholder="IP o host del broker (ej. mqtt.tudominio.com)" value="">
                     <input type="text" id="device-token" placeholder="Token / ID Dispositivo" value="esp32_hidro">
                     <button id="connect-btn" class="btn primary">Conectar</button>
                 </div>
-                <p class="hint">Puerto WebSocket 9001. Conexión directa mediante MQTT sobre WebSockets.</p>
+                <p class="hint" id="broker-info">Broker: detectando...</p>
             </section>
 
             <!-- Grid de Sensores y Controles -->
@@ -84,38 +83,89 @@
                 </div>
 
                 <!-- Tarjeta Bomba Principal -->
-                <div class="card control-card">
+                <div class="card control-card pump-card">
                     <div class="card-header">
                         <span class="label">Bomba Principal</span>
                         <span id="pump-status" class="status-text off">OFF</span>
                     </div>
-                    <div class="control-content">
-                        <div class="toggle-container">
-                            <label class="switch">
-                                <input type="checkbox" id="pump-toggle">
-                                <span class="slider round"></span>
-                            </label>
-                        </div>
-                        <p class="control-desc">Control manual de recirculación de agua.</p>
+                    <div class="pump-hero">
+                        <button id="pump-btn" class="pump-button" aria-label="Encender/Apagar bomba">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2v6m0 0a4 4 0 100 8 4 4 0 000-8z"/>
+                                <path d="M5 12H2m20 0h-3M7.05 7.05L4.93 4.93m14.14 0L16.95 7.05M7.05 16.95l-2.12 2.12m14.14 0l-2.12-2.12"/>
+                            </svg>
+                            <span class="pump-label">ENCENDER</span>
+                        </button>
                     </div>
+                    <p class="control-desc">Recirculación de agua del sistema hidropónico.</p>
                 </div>
 
                 <!-- Tarjeta Regulación pH -->
                 <div class="card control-card regulation">
                     <div class="card-header">
                         <span class="label">Regulación de pH</span>
+                        <span id="ph-auto-status" class="status-text off">MANUAL</span>
                     </div>
+
+                    <!-- Target pH -->
+                    <div class="ph-target-group">
+                        <span class="ph-target-label">pH objetivo</span>
+                        <div class="ph-target-control">
+                            <button id="ph-target-down" class="ph-adj-btn">−</button>
+                            <span id="ph-target-value" class="ph-target-num">6.0</span>
+                            <button id="ph-target-up" class="ph-adj-btn">+</button>
+                        </div>
+                        <span class="ph-range-hint">Rango activo: <span id="ph-range-text">5.5 – 6.5</span></span>
+                    </div>
+
+                    <!-- Dose & settle config -->
+                    <div class="ph-timing-row">
+                        <div class="ph-timing-field">
+                            <label for="dose-seconds">Dosis</label>
+                            <div class="ph-timing-input">
+                                <input type="number" id="dose-seconds" min="1" max="30" value="3">
+                                <span class="ph-timing-unit">seg</span>
+                            </div>
+                        </div>
+                        <div class="ph-timing-field">
+                            <label for="settle-seconds">Espera</label>
+                            <div class="ph-timing-input">
+                                <input type="number" id="settle-seconds" min="10" max="300" value="45">
+                                <span class="ph-timing-unit">seg</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="ph-timing-hint">Dosis: tiempo de bomba por pulso. Espera: pausa para que el agua mezcle.</p>
+
+                    <!-- Auto toggle -->
+                    <div class="ph-auto-row">
+                        <label class="switch">
+                            <input type="checkbox" id="ph-auto-toggle">
+                            <span class="slider round"></span>
+                        </label>
+                        <span class="ph-auto-label">Auto-regulación continua</span>
+                    </div>
+
+                    <!-- Auto status indicator -->
+                    <div id="ph-cycle-status" class="ph-cycle-status hidden">
+                        <div class="ph-cycle-bar">
+                            <div id="ph-cycle-progress" class="ph-cycle-progress"></div>
+                        </div>
+                        <span id="ph-cycle-text" class="ph-cycle-text">Esperando...</span>
+                    </div>
+
+                    <!-- Manual controls -->
                     <div class="regulation-controls">
                         <div class="reg-item">
-                            <span>Bomba pH+</span>
+                            <span>pH+ (subir)</span>
                             <button id="peri1-btn" class="btn-circular">ON</button>
                         </div>
                         <div class="reg-item">
-                            <span>Bomba pH-</span>
+                            <span>pH− (bajar)</span>
                             <button id="peri2-btn" class="btn-circular btn-red">ON</button>
                         </div>
                     </div>
-                    <p class="control-desc">Ajuste químico mediante bombas peristálticas.</p>
+                    <p class="control-desc">Auto: pulsos de dosis + pausa para estabilizar. Manual: control directo.</p>
                 </div>
             </div>
 

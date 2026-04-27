@@ -41,9 +41,9 @@
 // =============================================
 //  Configuración MQTT
 // =============================================
-#define MQTT_SERVER "192.168.0.13" // IP del servidor Docker (tu computadora)
-#define MQTT_PORT   1883
-#define DEVICE_TOKEN "esp32_hidro" // Debe coincidir con el de la UI
+// La IP/puerto del broker se configuran desde el portal web de la ESP32.
+// DEVICE_TOKEN es el valor por defecto; el portal puede reemplazarlo.
+#define DEVICE_TOKEN "esp32_hidro"
 
 // =============================================
 //  Credenciales Admin (Portal Interno)
