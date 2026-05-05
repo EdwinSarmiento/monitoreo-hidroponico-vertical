@@ -3,6 +3,8 @@
 .DS_Store
 *.txt
 
-# MQTT docker-prod: credenciales y entorno local
-docker-prod/mosquitto/config/passwd
-docker-prod/.env
+# Docker: datos de runtime, logs y credenciales
+docker/.env
+docker/mosquitto/config/passwd
+docker/mosquitto/data/
+docker/mosquitto/log/
