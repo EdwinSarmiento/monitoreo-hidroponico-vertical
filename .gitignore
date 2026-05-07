@@ -8,3 +8,5 @@ docker/.env
 docker/mosquitto/config/passwd
 docker/mosquitto/data/
 docker/mosquitto/log/
+docker/nginx/ssl/
+docker/certbot/

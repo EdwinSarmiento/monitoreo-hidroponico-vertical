@@ -1,14 +1,15 @@
-# Hidroponia IoT - Stack unificado (local y producción)
+# Hidroponia IoT - Stack con HTTPS (Let's Encrypt)
 #
-# Uso:
-#   docker compose up -d            (local, sin auth en mosquitto)
-#   docker compose up -d --build    (si cambias archivos de web-ui)
+# Desarrollo local (sin SSL):
+#   docker compose up -d mosquitto web-ui
 #
-# Producción con auth:
-#   1. cp .env.example .env          (ajustar puertos si hace falta)
-#   2. Editar mosquitto.conf: descomentar password_file, comentar allow_anonymous
-#   3. docker compose exec mosquitto mosquitto_passwd -c /mosquitto/config/passwd <usuario>
-#   4. docker compose restart mosquitto
+# Producción con SSL:
+#   1. cp .env.example .env          (configurar DOMAIN y SSL_EMAIL)
+#   2. chmod +x init-ssl.sh && ./init-ssl.sh
+#   3. docker compose up -d
+#
+# Renovar certificado:
+#   docker compose run --rm certbot renew && docker compose exec nginx nginx -s reload
 
 services:
   mosquitto:
@@ -17,7 +18,6 @@ services:
     restart: unless-stopped
     ports:
       - "${MQTT_PORT:-1883}:1883"
-      - "${MQTT_WS_PORT:-9001}:9001"
     volumes:
       - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
       - ./mosquitto/data:/mosquitto/data
@@ -25,6 +25,7 @@ services:
     networks:
       - hidro-net
 
+  # Desarrollo local: HTTP en puerto 8080 (sin SSL)
   web-ui:
     image: nginx:alpine
     container_name: hidro-web-ui
@@ -37,6 +38,32 @@ services:
       - mosquitto
     networks:
       - hidro-net
+
+  # Producción: HTTPS con Let's Encrypt + proxy WSS para MQTT
+  nginx:
+    image: nginx:alpine
+    container_name: hidro-nginx-ssl
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./certbot/www:/var/www/certbot:ro
+      - ../web-ui:/usr/share/nginx/html:ro
+    depends_on:
+      - mosquitto
+    networks:
+      - hidro-net
+
+  certbot:
+    image: certbot/certbot
+    container_name: hidro-certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
 networks:
   hidro-net:

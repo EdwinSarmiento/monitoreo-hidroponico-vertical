@@ -154,22 +154,48 @@ Esta tabla detalla el uso actual de los pines del ESP32 DevKit v1:
 
 El dashboard web y el broker MQTT corren en contenedores Docker. El ESP32 se comunica por MQTT (TCP) y el navegador por MQTT sobre WebSockets.
 
-### Levantar servicios
+### Desarrollo local (HTTP)
 
 ```bash
 cd docker
-cp .env.example .env    # Solo la primera vez, ajustar puertos si es necesario
-docker compose up -d
+docker compose up -d mosquitto web-ui
+```
+
+El dashboard estará disponible en `http://localhost:8080`.
+
+### Producción con HTTPS (Let's Encrypt)
+
+```bash
+cd docker
+cp .env.example .env    # Configurar DOMAIN y SSL_EMAIL
+chmod +x init-ssl.sh
+./init-ssl.sh           # Obtiene certificado SSL y levanta servicios
+docker compose up -d    # Levanta todos los servicios
+```
+
+El script `init-ssl.sh` se encarga de:
+1. Generar un certificado temporal auto-firmado (para que Nginx arranque)
+2. Levantar Nginx y Mosquitto
+3. Solicitar el certificado real a Let's Encrypt vía Certbot
+4. Recargar Nginx con el certificado real
+
+Los certificados se renuevan automáticamente. Para renovar manualmente:
+
+```bash
+docker compose run --rm certbot renew && docker compose exec nginx nginx -s reload
 ```
 
 ### Puertos
 
 | Servicio | Puerto | Protocolo | Uso |
 | :--- | :---: | :--- | :--- |
+| **Nginx** | `443` | HTTPS + WSS | Dashboard web + proxy MQTT (producción) |
+| **Nginx** | `80` | HTTP | Redirección a HTTPS + challenge Certbot |
+| **Nginx** | `8080` | HTTP | Dashboard web (desarrollo local) |
 | **Mosquitto** | `1883` | TCP | Conexión del ESP32 |
-| **Mosquitto** | `9001` | WebSockets | Conexión del dashboard web |
-| **Nginx** | `8080` | HTTP | Dashboard web (web-ui) |
 | **ESP32** | `80` | HTTP | Portal cautivo / admin (solo en red local) |
+
+> **Nota:** En producción, el navegador se conecta al broker MQTT por `wss://<dominio>/mqtt` (cifrado). Nginx hace proxy inverso hacia Mosquitto internamente. El dashboard detecta automáticamente si usar `ws://` o `wss://` según el protocolo de la página.
 
 ### Puertos reservados para expansión
 - `3000`: Grafana (visualización)
@@ -344,8 +370,11 @@ esp32/
 │   ├── app.js                  # Lógica MQTT, alertas, historial
 │   └── style.css               # Estilos del dashboard
 ├── docker/
-│   ├── docker-compose.yml      # Mosquitto + Nginx (web-ui)
+│   ├── docker-compose.yml      # Mosquitto + Nginx + Certbot
 │   ├── .env.example            # Plantilla de variables de entorno
+│   ├── init-ssl.sh             # Script de inicialización SSL (Let's Encrypt)
+│   ├── nginx/
+│   │   └── default.conf        # Config Nginx: HTTPS + proxy WSS → MQTT
 │   └── mosquitto/
 │       └── config/
 │           └── mosquitto.conf  # Configuración del broker MQTT
