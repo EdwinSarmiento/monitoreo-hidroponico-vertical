@@ -92,10 +92,13 @@ document.getElementById('ph-tolerance').addEventListener('change', (e) => {
 });
 
 // =============================================
-//  Broker: same host that served this page
+//  Broker: WebSocket via same host/port (Nginx proxy)
 // =============================================
-function getBrokerHost() {
-    return window.location.hostname || 'localhost';
+function getBrokerUrl() {
+    const proto = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const host = window.location.hostname || 'localhost';
+    const port = window.location.port || (proto === 'wss' ? '443' : '80');
+    return `${proto}://${host}:${port}/mqtt`;
 }
 
 // =============================================
@@ -115,17 +118,15 @@ function addLog(msg, type = 'system') {
 // =============================================
 function connect() {
     const token = document.getElementById('device-token').value.trim() || 'esp32_hidro';
-    const host = getBrokerHost();
-    const port = 9001;
+    const wsUrl = getBrokerUrl();
 
     currentDeviceToken = token;
     localStorage.setItem('mqtt_token', token);
 
     if (client) client.end();
 
-    const wsUrl = `ws://${host}:${port}`;
     addLog(`Conectando a ${wsUrl}...`);
-    brokerInfo.textContent = `Broker: ${host}:${port}`;
+    brokerInfo.textContent = `Broker: ${wsUrl}`;
 
     client = mqtt.connect(wsUrl, {
         clientId: 'web_ui_' + Math.random().toString(16).substring(2, 8),
