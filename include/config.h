@@ -20,8 +20,8 @@
 
 // Calibración del sensor de pH (ajustar con soluciones buffer)
 // Voltaje a pH 7.0 (solución neutra) y pH 4.0 (solución ácida)
-#define PH_VOLTAGE_AT_7  1.293f  // Voltaje en V cuando el pH es 7.0 (calibrado)
-#define PH_VOLTAGE_AT_4  1.818f  // Voltaje en V cuando el pH es 4.0 (calibrado)
+#define PH_VOLTAGE_AT_7  1.381f  // Voltaje en V cuando el pH es 7.0 (calibrado 10/05/2026)
+#define PH_VOLTAGE_AT_4  1.911f  // Voltaje en V cuando el pH es 4.0 (calibrado 10/05/2026)
 
 #define PH_READ_INTERVAL  2000  // Leer pH cada 2 segundos (ms)
 #define PH_SAMPLES         10   // Promedio de N lecturas para estabilizar

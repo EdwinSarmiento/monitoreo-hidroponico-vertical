@@ -10,31 +10,18 @@ let lastLevelState = 'OK';
 const SNOOZE_DURATION = 5 * 60 * 1000;
 
 // =============================================
-//  pH Auto-regulation State
+//  pH Auto-regulation State (controlada por firmware)
 // =============================================
 let phAutoEnabled = false;
 let phTarget = parseFloat(localStorage.getItem('ph_target') || '6.0');
-const PH_TOLERANCE = 0.5;
+let phTolerance = parseFloat(localStorage.getItem('ph_tolerance') || '0.3');
 let lastPH = null;
 let pumpIsOn = false;
 
-// Dose-and-wait cycle: 'idle' | 'dosing' | 'settling'
+// Estado del ciclo reportado por el firmware
 let phCycleState = 'idle';
-let phCycleTimer = null;
-let phCycleStart = 0;
-let phCycleDuration = 0;
-let phCycleDirection = ''; // 'up' | 'down'
+let phCycleDirection = '';
 let phProgressInterval = null;
-
-function getDoseMs() {
-    const v = parseInt(document.getElementById('dose-seconds').value) || 3;
-    return Math.max(1, Math.min(30, v)) * 1000;
-}
-
-function getSettleMs() {
-    const v = parseInt(document.getElementById('settle-seconds').value) || 45;
-    return Math.max(10, Math.min(300, v)) * 1000;
-}
 
 // =============================================
 //  UI Elements
@@ -70,15 +57,34 @@ const phCycleText = document.getElementById('ph-cycle-text');
 
 document.getElementById('device-token').value = localStorage.getItem('mqtt_token') || 'esp32_hidro';
 
-// Load saved timing
-document.getElementById('dose-seconds').value = localStorage.getItem('ph_dose_s') || '3';
-document.getElementById('settle-seconds').value = localStorage.getItem('ph_settle_s') || '45';
+// Load saved timing & tolerance
+document.getElementById('dose-seconds').value = localStorage.getItem('ph_dose_s') || '1';
+document.getElementById('settle-seconds').value = localStorage.getItem('ph_settle_s') || '90';
+document.getElementById('ph-tolerance').value = localStorage.getItem('ph_tolerance') || '0.3';
+
+function sendPhConfig() {
+    const dose = parseInt(document.getElementById('dose-seconds').value) || 1;
+    const settle = parseInt(document.getElementById('settle-seconds').value) || 90;
+    sendCommand('phTarget', phTarget);
+    sendCommand('phTol', phTolerance);
+    sendCommand('phDose', dose);
+    sendCommand('phSettle', settle);
+}
 
 document.getElementById('dose-seconds').addEventListener('change', (e) => {
     localStorage.setItem('ph_dose_s', e.target.value);
+    sendPhConfig();
 });
 document.getElementById('settle-seconds').addEventListener('change', (e) => {
     localStorage.setItem('ph_settle_s', e.target.value);
+    sendPhConfig();
+});
+document.getElementById('ph-tolerance').addEventListener('change', (e) => {
+    phTolerance = parseFloat(e.target.value) || 0.3;
+    phTolerance = Math.max(0.1, Math.min(2.0, phTolerance));
+    localStorage.setItem('ph_tolerance', phTolerance.toFixed(1));
+    updatePhTargetUI();
+    sendPhConfig();
 });
 
 // =============================================
@@ -163,10 +169,6 @@ function updateUI(data) {
         phVoltage.textContent = `Voltaje: ${data.phV.toFixed(3)} V`;
         const pos = (Math.min(Math.max(ph, 0), 14) / 14) * 100;
         phMarker.style.left = `${pos}%`;
-
-        if (phAutoEnabled && phCycleState === 'idle') {
-            evaluateAndDose(ph);
-        }
     }
 
     if (data.pump !== undefined) {
@@ -198,6 +200,62 @@ function updateUI(data) {
     if (data.hum !== undefined && data.temp !== undefined) {
         recordHistory(data.hum, data.temp);
     }
+
+    // Sincronizar estado de auto-regulación desde el firmware
+    if (data.phAuto !== undefined) {
+        phAutoEnabled = data.phAuto;
+        phAutoToggle.checked = phAutoEnabled;
+        phAutoStatus.textContent = phAutoEnabled ? 'AUTO' : 'MANUAL';
+        phAutoStatus.className = `status-text ${phAutoEnabled ? 'on' : 'off'}`;
+    }
+    if (data.phTarget !== undefined) {
+        phTarget = data.phTarget;
+        phTargetValue.textContent = phTarget.toFixed(1);
+    }
+    if (data.phTol !== undefined) {
+        phTolerance = data.phTol;
+        document.getElementById('ph-tolerance').value = phTolerance.toFixed(1);
+    }
+    if (data.phDose !== undefined) {
+        document.getElementById('dose-seconds').value = data.phDose;
+    }
+    if (data.phSettle !== undefined) {
+        document.getElementById('settle-seconds').value = data.phSettle;
+    }
+    if (data.phTarget !== undefined || data.phTol !== undefined) {
+        const lo = (phTarget - phTolerance).toFixed(1);
+        const hi = (phTarget + phTolerance).toFixed(1);
+        phRangeText.textContent = `${lo} – ${hi}`;
+    }
+
+    // Mostrar estado del ciclo de dosificación del firmware
+    if (data.phState !== undefined) {
+        phCycleState = data.phState;
+        phCycleDirection = data.phDir || '';
+        updateCycleStatusUI();
+    }
+}
+
+function updateCycleStatusUI() {
+    if (phCycleState === 'dosing') {
+        phCycleStatusEl.classList.remove('hidden');
+        phCycleProgress.className = 'ph-cycle-progress dosing';
+        phCycleProgress.style.width = '100%';
+        const label = phCycleDirection === 'up' ? 'Dosificando pH+ ...' : 'Dosificando pH− ...';
+        phCycleText.textContent = label;
+    } else if (phCycleState === 'settling') {
+        phCycleStatusEl.classList.remove('hidden');
+        phCycleProgress.className = 'ph-cycle-progress settling';
+        phCycleProgress.style.width = '100%';
+        phCycleText.textContent = 'Esperando estabilización...';
+    } else if (phAutoEnabled) {
+        phCycleStatusEl.classList.remove('hidden');
+        phCycleProgress.className = 'ph-cycle-progress idle';
+        phCycleProgress.style.width = '100%';
+        phCycleText.textContent = 'pH en rango ✓';
+    } else {
+        phCycleStatusEl.classList.add('hidden');
+    }
 }
 
 // =============================================
@@ -225,20 +283,22 @@ pumpBtn.addEventListener('click', () => {
 });
 
 // =============================================
-//  pH Auto-regulation: dose-and-wait cycle
+//  pH Auto-regulation: config → firmware via MQTT
 // =============================================
 function updatePhTargetUI() {
     phTargetValue.textContent = phTarget.toFixed(1);
-    const lo = (phTarget - PH_TOLERANCE).toFixed(1);
-    const hi = (phTarget + PH_TOLERANCE).toFixed(1);
+    const lo = (phTarget - phTolerance).toFixed(1);
+    const hi = (phTarget + phTolerance).toFixed(1);
     phRangeText.textContent = `${lo} – ${hi}`;
     localStorage.setItem('ph_target', phTarget.toFixed(1));
+    localStorage.setItem('ph_tolerance', phTolerance.toFixed(1));
 }
 
 phTargetUp.addEventListener('click', () => {
     if (phTarget < 10.0) {
         phTarget = Math.round((phTarget + 0.1) * 10) / 10;
         updatePhTargetUI();
+        sendPhConfig();
     }
 });
 
@@ -246,146 +306,25 @@ phTargetDown.addEventListener('click', () => {
     if (phTarget > 2.0) {
         phTarget = Math.round((phTarget - 0.1) * 10) / 10;
         updatePhTargetUI();
+        sendPhConfig();
     }
 });
 
 phAutoToggle.addEventListener('change', (e) => {
     phAutoEnabled = e.target.checked;
+    sendCommand('phAuto', phAutoEnabled);
     if (phAutoEnabled) {
         phAutoStatus.textContent = 'AUTO';
         phAutoStatus.className = 'status-text on';
-        addLog(`Auto-regulación ON → pH objetivo: ${phTarget.toFixed(1)} (±${PH_TOLERANCE}) | Dosis: ${getDoseMs()/1000}s | Espera: ${getSettleMs()/1000}s`, 'system');
-        if (lastPH !== null) evaluateAndDose(lastPH);
+        sendPhConfig();
+        addLog(`Auto-regulación enviada al firmware → pH objetivo: ${phTarget.toFixed(1)} (±${phTolerance.toFixed(1)})`, 'system');
     } else {
         phAutoStatus.textContent = 'MANUAL';
         phAutoStatus.className = 'status-text off';
-        addLog('Auto-regulación OFF', 'system');
-        cancelCycle();
+        addLog('Auto-regulación desactivada en firmware', 'system');
+        phCycleStatusEl.classList.add('hidden');
     }
 });
-
-function evaluateAndDose(ph) {
-    if (phCycleState !== 'idle') return;
-
-    const lo = phTarget - PH_TOLERANCE;
-    const hi = phTarget + PH_TOLERANCE;
-
-    if (ph < lo) {
-        startDose('up', ph, lo);
-    } else if (ph > hi) {
-        startDose('down', ph, hi);
-    } else {
-        showCycleIdle('pH en rango ✓');
-    }
-}
-
-function startDose(direction, currentPh, threshold) {
-    const doseMs = getDoseMs();
-    phCycleState = 'dosing';
-    phCycleDirection = direction;
-
-    if (direction === 'up') {
-        sendCommand('peri1', true);
-        sendCommand('peri2', false);
-        addLog(`[AUTO] pH ${currentPh.toFixed(2)} < ${threshold.toFixed(1)} → Bomba pH+ ON (${doseMs/1000}s)`, 'out');
-    } else {
-        sendCommand('peri1', false);
-        sendCommand('peri2', true);
-        addLog(`[AUTO] pH ${currentPh.toFixed(2)} > ${threshold.toFixed(1)} → Bomba pH− ON (${doseMs/1000}s)`, 'out');
-    }
-
-    startProgressBar(doseMs, direction === 'up' ? 'Dosificando pH+ ...' : 'Dosificando pH− ...');
-
-    phCycleTimer = setTimeout(() => {
-        sendCommand('peri1', false);
-        sendCommand('peri2', false);
-        addLog(`[AUTO] Dosis completada. Esperando ${getSettleMs()/1000}s para estabilización...`, 'system');
-        startSettle();
-    }, doseMs);
-}
-
-function startSettle() {
-    const settleMs = getSettleMs();
-    phCycleState = 'settling';
-
-    startProgressBar(settleMs, 'Esperando que el agua mezcle...');
-
-    phCycleTimer = setTimeout(() => {
-        phCycleState = 'idle';
-        addLog('[AUTO] Pausa completada. Evaluando pH...', 'system');
-        stopProgressBar();
-
-        if (phAutoEnabled && lastPH !== null) {
-            evaluateAndDose(lastPH);
-        }
-    }, settleMs);
-}
-
-function cancelCycle() {
-    if (phCycleTimer) {
-        clearTimeout(phCycleTimer);
-        phCycleTimer = null;
-    }
-    stopProgressBar();
-
-    if (phCycleState === 'dosing') {
-        sendCommand('peri1', false);
-        sendCommand('peri2', false);
-    }
-    phCycleState = 'idle';
-    phCycleDirection = '';
-    phCycleStatusEl.classList.add('hidden');
-}
-
-// =============================================
-//  Progress bar for dose / settle visualization
-// =============================================
-function startProgressBar(durationMs, label) {
-    stopProgressBar();
-    phCycleStatusEl.classList.remove('hidden');
-    phCycleText.textContent = label;
-    phCycleProgress.style.transition = 'none';
-    phCycleProgress.style.width = '0%';
-
-    phCycleStart = Date.now();
-    phCycleDuration = durationMs;
-
-    // Determine bar color
-    if (phCycleState === 'dosing') {
-        phCycleProgress.className = 'ph-cycle-progress dosing';
-    } else {
-        phCycleProgress.className = 'ph-cycle-progress settling';
-    }
-
-    requestAnimationFrame(() => {
-        phCycleProgress.style.transition = `width ${durationMs}ms linear`;
-        phCycleProgress.style.width = '100%';
-    });
-
-    phProgressInterval = setInterval(() => {
-        const elapsed = Date.now() - phCycleStart;
-        const remaining = Math.max(0, Math.ceil((durationMs - elapsed) / 1000));
-        phCycleText.textContent = `${label} (${remaining}s)`;
-        if (remaining <= 0) clearInterval(phProgressInterval);
-    }, 500);
-}
-
-function stopProgressBar() {
-    if (phProgressInterval) {
-        clearInterval(phProgressInterval);
-        phProgressInterval = null;
-    }
-    phCycleProgress.style.transition = 'none';
-    phCycleProgress.style.width = '0%';
-}
-
-function showCycleIdle(msg) {
-    phCycleStatusEl.classList.remove('hidden');
-    phCycleText.textContent = msg;
-    phCycleProgress.style.transition = 'none';
-    phCycleProgress.style.width = '100%';
-    phCycleProgress.className = 'ph-cycle-progress idle';
-}
 
 // =============================================
 //  Water Level Alert System
@@ -501,13 +440,13 @@ function sendCommand(cmd, action) {
 connectBtn.addEventListener('click', connect);
 
 peri1Btn.addEventListener('click', () => {
-    if (phAutoEnabled) { addLog('Desactiva auto-regulación para control manual.', 'error'); return; }
+    if (phAutoEnabled) { addLog('Desactiva auto-regulación en el firmware para control manual.', 'error'); return; }
     const isActive = peri1Btn.classList.contains('active');
     sendCommand('peri1', !isActive);
 });
 
 peri2Btn.addEventListener('click', () => {
-    if (phAutoEnabled) { addLog('Desactiva auto-regulación para control manual.', 'error'); return; }
+    if (phAutoEnabled) { addLog('Desactiva auto-regulación en el firmware para control manual.', 'error'); return; }
     const isActive = peri2Btn.classList.contains('active');
     sendCommand('peri2', !isActive);
 });

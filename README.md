@@ -5,7 +5,7 @@ Sistema de control IoT para cultivo hidropónico basado en ESP32 con comunicaci�
 ## Funcionalidades
 
 - **Sensor de pH con ADS1115** — Lectura de alta precisión (16-bit) vía I2C con promedio de 10 muestras y validación de datos
-- **Sensor de temperatura y humedad (AM2305B)** — Lectura ambiental cada 5 segundos vía protocolo DHT21 (GPIO17)
+- **Sensor de temperatura y humedad (AM2305B)** — Lectura ambiental cada 5 segundos vía protocolo DHT22 (GPIO19)
 - **Sensor de nivel de agua (DPL-1-BK)** — Interruptor de flotador para detectar nivel bajo (GPIO16)
 - **Alerta de nivel bajo** — Banner visual con sonido cuando el nivel de agua baja, silenciable por 5 minutos
 - **Historial de humedad** — Registro diario (mín/máx/promedio) almacenado localmente hasta 30 días
@@ -33,7 +33,7 @@ Sistema de control IoT para cultivo hidropónico basado en ESP32 con comunicaci�
 | Bomba peristáltica | Para regulación pH | 2 |
 | Módulo sensor pH | PH-4502C con electrodo E201-BNC | 1 |
 | ADC 16-bit | ADS1115 (I2C, dirección 0x48) | 1 |
-| Sensor temp/humedad | AM2305B (protocolo DHT21) | 1 |
+| Sensor temp/humedad | AM2305B (protocolo DHT22) | 1 |
 | Sensor de nivel | DPL-1-BK (interruptor de flotador) | 1 |
 | Soluciones buffer | pH 4.0 y pH 7.0 (para calibración) | 1 kit |
 
@@ -46,7 +46,7 @@ Sistema de control IoT para cultivo hidropónico basado en ESP32 con comunicaci�
 | GPIO25 | Bomba peristáltica pH- (bajar) |
 | GPIO21 | I2C SDA → ADS1115 |
 | GPIO22 | I2C SCL → ADS1115 |
-| GPIO17 | Datos → Sensor AM2305B (Temp/Humedad) |
+| GPIO19 | Datos → Sensor AM2305B (Temp/Humedad) |
 | GPIO16 | Señal → Flotador DPL-1-BK (Nivel de agua) |
 | GPIO0  | Botón BOOT → Reset WiFi (mantener 3s) |
 
@@ -95,10 +95,10 @@ AM2305B              ESP32
 ─────────            ──────
 VCC (rojo)   ────    3.3V (pin 3V3)
 GND (negro)  ────    GND
-DATA (amarillo) ──   GPIO17
+DATA (amarillo) ──   GPIO19
 ```
 
-> **Nota:** El AM2305B utiliza el protocolo DHT21. Algunos modelos incluyen resistencia pull-up interna; si la lectura es inestable, agregar una resistencia de 4.7kΩ entre DATA y VCC.
+> **Nota:** El AM2305B se comunica usando el protocolo DHT22. Algunos modelos incluyen resistencia pull-up interna; si la lectura es inestable, agregar una resistencia de 4.7kΩ entre DATA y VCC.
 
 ### Sensor de nivel de agua (DPL-1-BK)
 
@@ -137,7 +137,7 @@ Esta tabla detalla el uso actual de los pines del ESP32 DevKit v1:
 | **Control** | `GPIO 27` | Relé - Bomba de Agua Principal | Ocupado |
 | **Control** | `GPIO 26` | Bomba Peristáltica 1 (pH+) | Ocupado |
 | **Control** | `GPIO 25` | Bomba Peristáltica 2 (pH-) | Ocupado |
-| **Sensor** | `GPIO 17` | AM2305B - Temperatura/Humedad | Ocupado |
+| **Sensor** | `GPIO 19` | AM2305B - Temperatura/Humedad | Ocupado |
 | **Sensor** | `GPIO 16` | DPL-1-BK - Nivel de Agua | Ocupado |
 | **Entrada** | `GPIO 0` | Botón BOOT (Reset WiFi) | Ocupado |
 | **Disponible** | `GPIO 4, 13, 14` | Pines digitales libres | **LIBRE** |
@@ -361,7 +361,7 @@ esp32/
 | ESPAsyncWebServer-esphome | ^3.1.0 | Servidor web HTTP asíncrono |
 | Adafruit ADS1X15 | ^2.5.0 | Driver del ADC ADS1115 (I2C) |
 | Adafruit Unified Sensor | ^1.1.14 | Interfaz base para sensores Adafruit |
-| DHT sensor library | ^1.4.6 | Lectura del sensor AM2305B (DHT21) |
+| DHT sensor library | ^1.4.6 | Lectura del sensor AM2305B (DHT22) |
 | ArduinoJson | ^6.21.2 | Serialización JSON para MQTT |
 | PubSubClient | ^2.8 | Cliente MQTT |
 

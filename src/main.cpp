@@ -17,6 +17,7 @@
 #include "wifi_connect.h"
 #include "dht_sensor.h"
 #include "level_sensor.h"
+#include "ph_control.h"
 
 void setup() {
   Serial.begin(115200);
@@ -73,6 +74,7 @@ void setup() {
 
   loadWiFiCredentials();
   loadMQTTConfig();
+  loadPhControlConfig();
 
   if (savedSSID.length() > 0) {
     if (connectToWiFi()) {
@@ -111,6 +113,7 @@ void loop() {
   updatePH();
   updateDHT();
   updateLevelSensor();
+  updatePhControl();
 
   if (mqttConfigured) {
     if (!mqttClient.connected()) {
