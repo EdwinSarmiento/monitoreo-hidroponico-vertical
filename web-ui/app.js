@@ -63,12 +63,16 @@ document.getElementById('settle-seconds').value = localStorage.getItem('ph_settl
 document.getElementById('ph-tolerance').value = localStorage.getItem('ph_tolerance') || '0.3';
 
 function sendPhConfig() {
-    const dose = parseInt(document.getElementById('dose-seconds').value) || 1;
-    const settle = parseInt(document.getElementById('settle-seconds').value) || 90;
-    sendCommand('phTarget', phTarget);
-    sendCommand('phTol', phTolerance);
-    sendCommand('phDose', dose);
-    sendCommand('phSettle', settle);
+    if (!client || !client.connected) return;
+    const topic = `hidroponia/${currentDeviceToken}/cmd`;
+    const payload = JSON.stringify({
+        phTarget: phTarget,
+        phTol: phTolerance,
+        phDose: parseInt(document.getElementById('dose-seconds').value) || 1,
+        phSettle: parseInt(document.getElementById('settle-seconds').value) || 90
+    });
+    client.publish(topic, payload);
+    addLog(`Config pH enviada: ${payload}`, 'out');
 }
 
 document.getElementById('dose-seconds').addEventListener('change', (e) => {
