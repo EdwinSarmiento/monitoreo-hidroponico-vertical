@@ -15,6 +15,9 @@ static void mqttCallback(char *topic, byte *payload, unsigned int length) {
   if (doc.containsKey("pump")) setPump(doc["pump"].as<bool>());
   if (doc.containsKey("peri1")) setPeristaltic(1, doc["peri1"].as<bool>());
   if (doc.containsKey("peri2")) setPeristaltic(2, doc["peri2"].as<bool>());
+
+  // Forzar publicación inmediata para que el dashboard refleje el cambio al instante
+  lastMQTTPublish = 0;
 }
 
 void connectMQTT() {
@@ -41,7 +44,7 @@ void connectMQTT() {
 
 void publishMQTT() {
   if (!mqttClient.connected()) return;
-  if (millis() - lastMQTTPublish < 5000) return;
+  if (millis() - lastMQTTPublish < 2000) return;
   lastMQTTPublish = millis();
 
   StaticJsonDocument<256> doc;

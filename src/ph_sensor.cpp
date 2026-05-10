@@ -1,6 +1,8 @@
 #include "ph_sensor.h"
 #include "app_state.h"
 #include "config.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 float readPHVoltage() {
   if (!adsReady) return 0.0f;
@@ -13,7 +15,7 @@ float readPHVoltage() {
       total += raw;
       validSamples++;
     }
-    delay(10);
+    vTaskDelay(pdMS_TO_TICKS(10));
   }
   if (validSamples == 0) return 0.0f;
   float avgRaw = (float)total / validSamples;
