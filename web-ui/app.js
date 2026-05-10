@@ -92,13 +92,17 @@ document.getElementById('ph-tolerance').addEventListener('change', (e) => {
 });
 
 // =============================================
-//  Broker: WebSocket via same host/port (Nginx proxy)
+//  Broker: WebSocket connection URL
+//  - HTTPS → wss://host/mqtt (via Nginx proxy)
+//  - HTTP  → ws://host:9001  (directo a Mosquitto)
 // =============================================
 function getBrokerUrl() {
-    const proto = window.location.protocol === 'https:' ? 'wss' : 'ws';
     const host = window.location.hostname || 'localhost';
-    const port = window.location.port || (proto === 'wss' ? '443' : '80');
-    return `${proto}://${host}:${port}/mqtt`;
+    if (window.location.protocol === 'https:') {
+        const port = window.location.port || '443';
+        return `wss://${host}:${port}/mqtt`;
+    }
+    return `ws://${host}:9001`;
 }
 
 // =============================================

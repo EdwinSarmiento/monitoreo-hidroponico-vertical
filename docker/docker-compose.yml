@@ -17,6 +17,7 @@ services:
     restart: unless-stopped
     ports:
       - "${MQTT_PORT:-1883}:1883"
+      - "${MQTT_WS_PORT:-9001}:9001"
     volumes:
       - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
       - ./mosquitto/data:/mosquitto/data

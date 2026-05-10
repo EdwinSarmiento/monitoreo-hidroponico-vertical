@@ -60,6 +60,7 @@ void connectMQTT() {
   if (!mqttConfigured || mqttClient.connected()) return;
 
   Serial.printf("[MQTT] Conectando a %s:%d...\n", mqttServer.c_str(), mqttPort);
+  mqttClient.setBufferSize(512);
   mqttClient.setServer(mqttServer.c_str(), mqttPort);
   mqttClient.setCallback(mqttCallback);
 
@@ -113,8 +114,9 @@ void publishMQTT() {
   serializeJson(doc, buf);
 
   String topic = "hidroponia/" + deviceToken + "/state";
-  mqttClient.publish(topic.c_str(), buf);
-  Serial.printf("[MQTT] Publicado -> pH: %.2f V: %.3f auto:%s state:%s\n",
+  bool sent = mqttClient.publish(topic.c_str(), buf);
+  Serial.printf("[MQTT] %s -> pH: %.2f V: %.3f auto:%s state:%s\n",
+                sent ? "Publicado" : "ERROR ENVIO",
                 currentPH, currentVoltage,
                 phAutoEnabled ? "ON" : "OFF", stateStr);
 }
