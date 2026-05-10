@@ -8,7 +8,7 @@
 #define PERISTALTIC_1_PIN 26  // GPIO26 -> Bomba peristáltica pH (subir)
 #define PERISTALTIC_2_PIN 25  // GPIO25 -> Bomba peristáltica pH (bajar)
 #define WIFI_RESET_PIN     0  // GPIO0 (botón BOOT) -> Mantener 3s para resetear WiFi
-#define DHT_PIN           17  // GPIO17 -> Sensor AM2305B (Temp/Hum)
+#define DHT_PIN           19  // GPIO19 -> Sensor AM2305B (Temp/Hum)
 #define LEVEL_SENSOR_PIN  16  // GPIO16 -> Interruptor de flotador (Nivel)
 
 // =============================================
@@ -29,7 +29,7 @@
 // =============================================
 //  Temperatura y Humedad (AM2305B)
 // =============================================
-#define DHT_TYPE          DHT21 // AM2305B usa el protocolo DHT21/AM2301
+#define DHT_TYPE          DHT22 // AM2305B a menudo requiere el protocolo DHT22
 #define ENV_READ_INTERVAL 5000  // Leer cada 5 segundos
 
 // =============================================
