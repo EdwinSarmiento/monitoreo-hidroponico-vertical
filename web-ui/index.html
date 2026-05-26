@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hidroponia IoT - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+</head>
+<body>
+    <!-- Alert Banner (hidden by default, shown when water level is LOW) -->
+    <div id="alert-banner" class="alert-banner">
+        <span class="alert-icon">⚠️</span>
+        <span class="alert-text">¡ALERTA! Nivel de agua bajo — Revise el depósito</span>
+        <button id="alert-dismiss" class="alert-dismiss">Silenciar</button>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="logo">
+                <span class="icon">🌿</span>
+                <h1>Hidroponia <span class="accent">IoT</span></h1>
+            </div>
+            <div id="connection-status" class="status-badge disconnected">Desconectado</div>
+        </header>
+
+        <main>
+            <!-- Conexión al Broker -->
+            <section class="config-card card">
+                <h3><span class="dot"></span> Broker MQTT</h3>
+                <div class="form-group">
+                    <input type="text" id="device-token" placeholder="Token / ID Dispositivo" value="esp32_hidro">
+                    <button id="connect-btn" class="btn primary">Conectar</button>
+                </div>
+                <p class="hint" id="broker-info">Broker: detectando...</p>
+            </section>
+
+            <!-- Grid de Sensores y Controles -->
+            <div class="dashboard-grid">
+                <!-- Tarjeta pH -->
+                <div class="card sensor-card">
+                    <div class="card-header">
+                        <span class="label">Nivel de pH</span>
+                        <span class="trend" id="ph-trend">--</span>
+                    </div>
+                    <div class="sensor-value">
+                        <span id="ph-value">--</span><span class="unit">pH</span>
+                    </div>
+                    <div class="ph-gauge-container">
+                        <div class="ph-gauge-bar">
+                            <div id="ph-marker" class="marker"></div>
+                        </div>
+                    </div>
+                    <div class="sensor-meta" id="ph-voltage">Voltaje: -- V</div>
+                </div>
+
+                <!-- Tarjeta Ambiente -->
+                <div class="card sensor-card ambient">
+                    <div class="card-header">
+                        <span class="label">Ambiente</span>
+                    </div>
+                    <div class="ambient-values">
+                        <div class="val-group">
+                            <span id="temp-value">--</span><span class="unit">°C</span>
+                            <div class="label-sub">Temperatura</div>
+                        </div>
+                        <div class="val-group">
+                            <span id="hum-value">--</span><span class="unit">%</span>
+                            <div class="label-sub">Humedad</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta Nivel de Agua -->
+                <div class="card sensor-card level">
+                    <div class="card-header">
+                        <span class="label">Nivel de Agua</span>
+                    </div>
+                    <div class="level-indicator">
+                        <div id="level-badge" class="badge ok">OPTIMO</div>
+                    </div>
+                    <p class="control-desc" id="level-desc">Depósito con agua suficiente.</p>
+                </div>
+
+                <!-- Tarjeta Bomba Principal -->
+                <div class="card control-card pump-card">
+                    <div class="card-header">
+                        <span class="label">Bomba Principal</span>
+                        <span id="pump-status" class="status-text off">OFF</span>
+                    </div>
+                    <div class="pump-hero">
+                        <button id="pump-btn" class="pump-button" aria-label="Encender/Apagar bomba">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2v6m0 0a4 4 0 100 8 4 4 0 000-8z"/>
+                                <path d="M5 12H2m20 0h-3M7.05 7.05L4.93 4.93m14.14 0L16.95 7.05M7.05 16.95l-2.12 2.12m14.14 0l-2.12-2.12"/>
+                            </svg>
+                            <span class="pump-label">ENCENDER</span>
+                        </button>
+                    </div>
+                    <p class="control-desc">Recirculación de agua del sistema hidropónico.</p>
+                </div>
+
+                <!-- Tarjeta Regulación pH -->
+                <div class="card control-card regulation">
+                    <div class="card-header">
+                        <span class="label">Regulación de pH</span>
+                        <span id="ph-auto-status" class="status-text off">MANUAL</span>
+                    </div>
+
+                    <!-- Target pH -->
+                    <div class="ph-target-group">
+                        <span class="ph-target-label">pH objetivo</span>
+                        <div class="ph-target-control">
+                            <button id="ph-target-down" class="ph-adj-btn">−</button>
+                            <span id="ph-target-value" class="ph-target-num">6.0</span>
+                            <button id="ph-target-up" class="ph-adj-btn">+</button>
+                        </div>
+                        <span class="ph-range-hint">Rango activo: <span id="ph-range-text">5.5 – 6.5</span></span>
+                    </div>
+
+                    <!-- Dose, settle & tolerance config -->
+                    <div class="ph-timing-row">
+                        <div class="ph-timing-field">
+                            <label for="dose-seconds">Dosis</label>
+                            <div class="ph-timing-input">
+                                <input type="number" id="dose-seconds" min="1" max="30" value="1">
+                                <span class="ph-timing-unit">seg</span>
+                            </div>
+                        </div>
+                        <div class="ph-timing-field">
+                            <label for="settle-seconds">Espera</label>
+                            <div class="ph-timing-input">
+                                <input type="number" id="settle-seconds" min="10" max="300" value="90">
+                                <span class="ph-timing-unit">seg</span>
+                            </div>
+                        </div>
+                        <div class="ph-timing-field">
+                            <label for="ph-tolerance">Tolerancia</label>
+                            <div class="ph-timing-input">
+                                <input type="number" id="ph-tolerance" min="0.1" max="2.0" step="0.1" value="0.3">
+                                <span class="ph-timing-unit">±pH</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="ph-timing-hint">Dosis: tiempo de bomba por pulso. Espera: pausa para mezclar. Tolerancia: rango aceptable.</p>
+
+                    <!-- Auto toggle -->
+                    <div class="ph-auto-row">
+                        <label class="switch">
+                            <input type="checkbox" id="ph-auto-toggle">
+                            <span class="slider round"></span>
+                        </label>
+                        <span class="ph-auto-label">Auto-regulación continua</span>
+                    </div>
+
+                    <!-- Auto status indicator -->
+                    <div id="ph-cycle-status" class="ph-cycle-status hidden">
+                        <div class="ph-cycle-bar">
+                            <div id="ph-cycle-progress" class="ph-cycle-progress"></div>
+                        </div>
+                        <span id="ph-cycle-text" class="ph-cycle-text">Esperando...</span>
+                    </div>
+
+                    <!-- Manual controls -->
+                    <div class="regulation-controls">
+                        <div class="reg-item">
+                            <span>pH+ (subir)</span>
+                            <button id="peri1-btn" class="btn-circular">ON</button>
+                        </div>
+                        <div class="reg-item">
+                            <span>pH− (bajar)</span>
+                            <button id="peri2-btn" class="btn-circular btn-red">ON</button>
+                        </div>
+                    </div>
+                    <p class="control-desc">Auto: pulsos de dosis + pausa para estabilizar. Manual: control directo.</p>
+                </div>
+            </div>
+
+            <!-- Historial de Humedad Ambiental -->
+            <section id="history-section" class="card history-section">
+                <div class="card-header">
+                    <div class="header-left">
+                        <span class="label">📊 Historial de Humedad Ambiental</span>
+                    </div>
+                    <div class="header-right">
+                        <span id="days-badge" class="days-badge">0/30 días</span>
+                        <button id="clear-history" class="btn-clear-history">Limpiar</button>
+                    </div>
+                </div>
+                <div class="history-table-wrapper">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Hum. Mín</th>
+                                <th>Hum. Máx</th>
+                                <th>Hum. Prom</th>
+                                <th>Temp. Prom</th>
+                                <th>Lecturas</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Terminal de Logs -->
+            <section class="card terminal">
+                <div class="card-header">
+                    <span class="label">Actividad del Sistema</span>
+                    <button class="clear-btn" id="clear-logs">Limpiar</button>
+                </div>
+                <div id="log-content" class="log-content">
+                    <div class="log-entry system">Listo para conectar...</div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Hidroponia IoT Cloud &copy; 2026 - Control Remoto via MQTT</p>
+        </footer>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

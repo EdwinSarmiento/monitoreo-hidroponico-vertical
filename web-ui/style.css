@@ -1,0 +1,883 @@
+:root {
+    --bg-color: #0d1117;
+    --card-bg: rgba(22, 27, 34, 0.8);
+    --accent-color: #238636;
+    --accent-glow: #2ea043;
+    --text-primary: #e6edf3;
+    --text-secondary: #8b949e;
+    --border-color: #30363d;
+    --error-color: #f85149;
+    --warning-color: #d29922;
+    --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background-color: var(--bg-color);
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(35, 134, 54, 0.05) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(56, 139, 253, 0.05) 0px, transparent 50%);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+/* Header */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.logo h1 {
+    font-size: 1.8rem;
+    font-weight: 800;
+}
+
+.accent {
+    color: var(--accent-glow);
+}
+
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.connected {
+    background: rgba(35, 134, 54, 0.2);
+    color: #4ade80;
+    border: 1px solid var(--accent-color);
+}
+
+.disconnected {
+    background: rgba(248, 81, 73, 0.1);
+    color: var(--error-color);
+    border: 1px solid var(--error-color);
+}
+
+/* Cards */
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: var(--card-shadow);
+    backdrop-filter: blur(8px);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    align-items: center;
+}
+
+.label {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05rem;
+}
+
+/* Config & Form */
+.config-card {
+    margin-bottom: 2rem;
+}
+
+.form-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin: 1.2rem 0;
+}
+
+.form-group input {
+    min-width: 180px;
+}
+
+.form-group .btn {
+    flex-shrink: 0;
+    width: 100%;
+}
+
+input {
+    flex: 1;
+    background: #161b22;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    color: white;
+    font-size: 0.9rem;
+    transition: border 0.3s;
+}
+
+input:focus {
+    border-color: var(--accent-glow);
+    outline: none;
+}
+
+.btn {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.3s;
+}
+
+.btn.primary {
+    background: var(--accent-color);
+    color: white;
+}
+
+.btn:hover {
+    filter: brightness(1.2);
+}
+
+.btn:active {
+    transform: scale(0.95);
+}
+
+.hint {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+/* Grid & Sensors */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.sensor-value {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin: 0.5rem 0;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+}
+
+.unit {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    margin-left: 0.5rem;
+}
+
+.ph-gauge-bar {
+    width: 100%;
+    height: 8px;
+    background: linear-gradient(to right, #f85149, #d29922, #4ade80, #388bfd, #8957e5);
+    border-radius: 4px;
+    position: relative;
+    margin: 1.5rem 0;
+}
+
+.marker {
+    position: absolute;
+    top: -6px;
+    width: 4px;
+    height: 20px;
+    background: white;
+    box-shadow: 0 0 10px white;
+    border-radius: 2px;
+    transition: left 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.sensor-meta {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+/* Ambient Card Style */
+.ambient-values {
+    display: flex;
+    justify-content: space-around;
+    padding: 1rem 0;
+    text-align: center;
+}
+
+.val-group .unit {
+    font-size: 1rem;
+    margin-left: 2px;
+}
+
+.val-group span:first-child {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.label-sub {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    margin-top: 5px;
+}
+
+/* Level Indicator Style */
+.level-indicator {
+    padding: 1.5rem 0;
+    display: flex;
+    justify-content: center;
+}
+
+.badge {
+    padding: 0.6rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+}
+
+.badge.ok {
+    background: rgba(35, 134, 54, 0.15);
+    color: #4ade80;
+    border: 1px solid var(--accent-color);
+}
+
+.badge.low {
+    background: rgba(248, 81, 73, 0.15);
+    color: var(--error-color);
+    border: 1px solid var(--error-color);
+    animation: flash 1.5s infinite;
+}
+
+@keyframes flash {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.05); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+/* Controls */
+.control-desc {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 1rem;
+}
+
+/* Switch UI */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input { opacity: 0; width: 0; height: 0; }
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #30363d;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px; width: 26px;
+    left: 4px; bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider { background-color: var(--accent-glow); }
+input:checked + .slider:before { transform: translateX(26px); }
+
+/* =============================================
+   Pump Hero Button
+   ============================================= */
+.pump-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.pump-card .card-header {
+    width: 100%;
+}
+
+.pump-hero {
+    display: flex;
+    justify-content: center;
+    padding: 1.5rem 0;
+}
+
+.pump-button {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 3px solid var(--border-color);
+    background: radial-gradient(circle at 40% 35%, #1e2a38, #0d1117);
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+}
+
+.pump-button svg {
+    width: 36px;
+    height: 36px;
+    transition: all 0.3s;
+}
+
+.pump-label {
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08rem;
+}
+
+.pump-button:hover {
+    border-color: var(--accent-glow);
+    transform: scale(1.05);
+}
+
+.pump-button:active {
+    transform: scale(0.95);
+}
+
+.pump-button.on {
+    border-color: var(--accent-glow);
+    background: radial-gradient(circle at 40% 35%, #153020, #0d1117);
+    color: #4ade80;
+    box-shadow:
+        0 0 30px rgba(46, 160, 67, 0.25),
+        inset 0 0 20px rgba(46, 160, 67, 0.08);
+}
+
+.pump-button.on svg {
+    filter: drop-shadow(0 0 6px rgba(74, 222, 128, 0.5));
+    animation: pumpSpin 3s linear infinite;
+}
+
+@keyframes pumpSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* =============================================
+   pH Regulation Card
+   ============================================= */
+.ph-target-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 1rem;
+}
+
+.ph-target-label {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.06rem;
+    font-weight: 600;
+}
+
+.ph-target-control {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.ph-adj-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    background: #161b22;
+    color: var(--text-primary);
+    font-size: 1.4rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    line-height: 1;
+}
+
+.ph-adj-btn:hover {
+    border-color: var(--accent-glow);
+    background: rgba(35, 134, 54, 0.15);
+}
+
+.ph-adj-btn:active {
+    transform: scale(0.9);
+}
+
+.ph-target-num {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    min-width: 4rem;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+.ph-range-hint {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+}
+
+/* pH Timing Controls */
+.ph-timing-row {
+    display: flex;
+    gap: 1rem;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 0.5rem;
+}
+
+.ph-timing-field {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.ph-timing-field label {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05rem;
+    font-weight: 600;
+}
+
+.ph-timing-input {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ph-timing-input input {
+    width: 70px;
+    padding: 8px 10px;
+    text-align: center;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 8px;
+    -moz-appearance: textfield;
+}
+
+.ph-timing-input input::-webkit-outer-spin-button,
+.ph-timing-input input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.ph-timing-unit {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.ph-timing-hint {
+    font-size: 0.68rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.8rem;
+    line-height: 1.4;
+}
+
+.ph-auto-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 0.8rem;
+}
+
+.ph-auto-label {
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+/* pH Cycle Progress Bar */
+.ph-cycle-status {
+    margin-bottom: 1rem;
+    transition: opacity 0.3s;
+}
+
+.ph-cycle-status.hidden {
+    display: none;
+}
+
+.ph-cycle-bar {
+    width: 100%;
+    height: 6px;
+    background: #161b22;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+
+.ph-cycle-progress {
+    height: 100%;
+    width: 0%;
+    border-radius: 3px;
+}
+
+.ph-cycle-progress.dosing {
+    background: linear-gradient(90deg, #f59e0b, #f97316);
+}
+
+.ph-cycle-progress.settling {
+    background: linear-gradient(90deg, #3b82f6, #6366f1);
+}
+
+.ph-cycle-progress.idle {
+    background: var(--accent-glow);
+}
+
+.ph-cycle-text {
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* Peristaltic Buttons */
+.regulation-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.reg-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn-circular {
+    width: 50px;
+    height: 50px;
+    border-radius: 25px;
+    border: none;
+    background: #30363d;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-circular.active {
+    background: var(--accent-glow);
+    box-shadow: 0 0 15px var(--accent-glow);
+}
+
+.btn-red.active {
+    background: var(--error-color);
+    box-shadow: 0 0 15px var(--error-color);
+}
+
+/* Terminal */
+.terminal {
+    background: black;
+    border: 1px solid #333;
+}
+
+.log-content {
+    height: 150px;
+    overflow-y: auto;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.8rem;
+    padding-top: 1rem;
+}
+
+.log-entry { margin-bottom: 4px; }
+.system { color: #8b949e; }
+.in { color: #4ade80; }
+.out { color: #58a6ff; }
+
+.clear-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+footer {
+    margin-top: 3rem;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+/* Animations */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    background: var(--accent-glow);
+    border-radius: 50%;
+    margin-right: 5px;
+    animation: pulse 2s infinite;
+}
+
+/* =============================================
+   Water Level Alert Banner
+   ============================================= */
+.alert-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: rgba(248, 81, 73, 0.15);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(248, 81, 73, 0.4);
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    transform: translateY(-100%);
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.alert-banner.visible {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: all;
+}
+
+.alert-banner .alert-icon {
+    font-size: 1.5rem;
+    animation: alertPulse 1s infinite;
+}
+
+.alert-banner .alert-text {
+    color: #ff6b6b;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.02rem;
+}
+
+.alert-banner .alert-dismiss {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(248, 81, 73, 0.4);
+    color: #ff9b9b;
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05rem;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.alert-banner .alert-dismiss:hover {
+    background: rgba(248, 81, 73, 0.3);
+    transform: scale(1.05);
+}
+
+@keyframes alertPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.7; }
+}
+
+/* Push content down when alert is visible */
+body.alert-active {
+    padding-top: 60px;
+}
+
+/* =============================================
+   Humidity History Table
+   ============================================= */
+.history-section {
+    margin-bottom: 2rem;
+}
+
+.history-section .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
+}
+
+.history-section .header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.history-section .header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.days-badge {
+    background: rgba(56, 139, 253, 0.15);
+    color: #58a6ff;
+    border: 1px solid rgba(56, 139, 253, 0.3);
+    padding: 0.3rem 0.7rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.03rem;
+    white-space: nowrap;
+}
+
+.btn-clear-history {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 0.35rem 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.7rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-clear-history:hover {
+    border-color: var(--error-color);
+    color: var(--error-color);
+    background: rgba(248, 81, 73, 0.1);
+}
+
+.history-table-wrapper {
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.history-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.history-table th {
+    background: rgba(22, 27, 34, 0.95);
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06rem;
+    padding: 0.8rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.history-table td {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid rgba(48, 54, 61, 0.5);
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.history-table tbody tr {
+    transition: background 0.15s;
+}
+
+.history-table tbody tr:nth-child(even) {
+    background: rgba(22, 27, 34, 0.4);
+}
+
+.history-table tbody tr:hover {
+    background: rgba(56, 139, 253, 0.06);
+}
+
+.history-table .hum-min { color: #58a6ff; }
+.history-table .hum-max { color: #f85149; }
+.history-table .hum-avg { color: #4ade80; font-weight: 600; }
+.history-table .temp-avg { color: #d29922; }
+
+.history-empty {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.history-empty .empty-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    display: block;
+    opacity: 0.5;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .alert-banner {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding: 0.8rem 1rem;
+    }
+
+    .alert-banner .alert-text {
+        font-size: 0.8rem;
+    }
+
+    .history-table th,
+    .history-table td {
+        padding: 0.6rem 0.6rem;
+        font-size: 0.78rem;
+    }
+
+    .history-section .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.8rem;
+    }
+}

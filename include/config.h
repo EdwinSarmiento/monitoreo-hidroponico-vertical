@@ -8,6 +8,8 @@
 #define PERISTALTIC_1_PIN 26  // GPIO26 -> Bomba peristáltica pH (subir)
 #define PERISTALTIC_2_PIN 25  // GPIO25 -> Bomba peristáltica pH (bajar)
 #define WIFI_RESET_PIN     0  // GPIO0 (botón BOOT) -> Mantener 3s para resetear WiFi
+#define DHT_PIN           19  // GPIO19 -> Sensor AM2305B (Temp/Hum)
+#define LEVEL_SENSOR_PIN  16  // GPIO16 -> Interruptor de flotador (Nivel)
 
 // =============================================
 //  I2C - ADS1115 (sensor de pH)
@@ -18,16 +20,35 @@
 
 // Calibración del sensor de pH (ajustar con soluciones buffer)
 // Voltaje a pH 7.0 (solución neutra) y pH 4.0 (solución ácida)
-#define PH_VOLTAGE_AT_7  1.293f  // Voltaje en V cuando el pH es 7.0 (calibrado)
-#define PH_VOLTAGE_AT_4  1.818f  // Voltaje en V cuando el pH es 4.0 (calibrado)
+#define PH_VOLTAGE_AT_7  1.381f  // Voltaje en V cuando el pH es 7.0 (calibrado 10/05/2026)
+#define PH_VOLTAGE_AT_4  1.911f  // Voltaje en V cuando el pH es 4.0 (calibrado 10/05/2026)
 
 #define PH_READ_INTERVAL  2000  // Leer pH cada 2 segundos (ms)
 #define PH_SAMPLES         10   // Promedio de N lecturas para estabilizar
+
+// =============================================
+//  Temperatura y Humedad (AM2305B)
+// =============================================
+#define DHT_TYPE          DHT22 // AM2305B a menudo requiere el protocolo DHT22
+#define ENV_READ_INTERVAL 5000  // Leer cada 5 segundos
 
 // =============================================
 //  Configuración WiFiManager
 // =============================================
 #define AP_NAME     "Hidroponia-Setup"
 #define AP_PASSWORD "hidroponia123"
+
+// =============================================
+//  Configuración MQTT
+// =============================================
+// La IP/puerto del broker se configuran desde el portal web de la ESP32.
+// DEVICE_TOKEN es el valor por defecto; el portal puede reemplazarlo.
+#define DEVICE_TOKEN "esp32_hidro"
+
+// =============================================
+//  Credenciales Admin (Portal Interno)
+// =============================================
+#define ADMIN_USER "admin"
+#define ADMIN_PASS "admin"
 
 #endif

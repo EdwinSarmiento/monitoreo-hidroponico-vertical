@@ -2,3 +2,9 @@
 .vscode
 .DS_Store
 *.txt
+
+# Docker: datos de runtime, logs y credenciales
+docker/.env
+docker/mosquitto/config/passwd
+docker/mosquitto/data/
+docker/mosquitto/log/
